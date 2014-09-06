@@ -929,6 +929,11 @@ SpriteMorph.prototype.initBlocks = function () {
             category: 'sensing',
             spec: 'current %dates'
         },
+        doVibrate: {
+            type: 'command',
+            category: 'sensing',
+            spec: 'vibrate %n seconds'
+        },
 
         // Operators
         reifyScript: {
@@ -5297,6 +5302,8 @@ StageMorph.prototype.blockTemplates = function (category) {
         blocks.push(block('doSetFastTracking'));
         blocks.push('-');
         blocks.push(block('reportDate'));
+        blocks.push('-');
+        blocks.push(block('doVibrate'));
 
     // for debugging: ///////////////
 
