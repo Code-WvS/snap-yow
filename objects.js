@@ -934,6 +934,26 @@ SpriteMorph.prototype.initBlocks = function () {
             category: 'sensing',
             spec: 'vibrate %n seconds'
         },
+        reportCompassHeading: {
+            type: 'reporter',
+            category: 'sensing',
+            spec: 'current compass heading'
+        },
+        reportAccelerationX: {
+            type: 'reporter',
+            category: 'sensing',
+            spec: 'current acceleration along the x axes'
+        },
+        reportAccelerationY: {
+            type: 'reporter',
+            category: 'sensing',
+            spec: 'current acceleration along the y axes'
+        },
+        reportAccelerationZ: {
+            type: 'reporter',
+            category: 'sensing',
+            spec: 'current acceleration along the z axes'
+        },
 
         // Operators
         reifyScript: {
@@ -2041,6 +2061,12 @@ SpriteMorph.prototype.blockTemplates = function (category) {
         blocks.push(block('reportDate'));
         blocks.push('-');
         blocks.push(block('doVibrate'));
+        blocks.push('-');
+        blocks.push(block('reportCompassHeading'));
+        blocks.push('-');
+        blocks.push(block('reportAccelerationX'));
+        blocks.push(block('reportAccelerationY'));
+        blocks.push(block('reportAccelerationZ'));
         blocks.push('-');
         blocks.push(block('overpassQuery'));
 
@@ -4538,6 +4564,8 @@ StageMorph.prototype.init = function (globals) {
     this.paletteCache = {}; // not to be serialized (!)
     this.lastAnswer = ''; // last user input, do not persist
     this.activeSounds = []; // do not persist
+    this.acceleration = null; // do not persist
+    this.compassHeading = null; // do not persist
 
     this.trailsCanvas = null;
     this.isThreadSafe = false;
@@ -5306,6 +5334,12 @@ StageMorph.prototype.blockTemplates = function (category) {
         blocks.push(block('reportDate'));
         blocks.push('-');
         blocks.push(block('doVibrate'));
+        blocks.push('-');
+        blocks.push(block('reportCompassHeading'));
+        blocks.push('-');
+        blocks.push(block('reportAccelerationX'));
+        blocks.push(block('reportAccelerationY'));
+        blocks.push(block('reportAccelerationZ'));
 
     // for debugging: ///////////////
 

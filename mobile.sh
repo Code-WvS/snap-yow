@@ -46,10 +46,10 @@ echo "Adding cordova plugins"
 # add everything needed and build for $device
 cordova platform add "$1" > /dev/null
 cordova plugin add org.apache.cordova.geolocation \
+    org.apache.cordova.device-motion \
+    org.apache.cordova.device-orientation \
     org.apache.cordova.vibration 2> /dev/null
     #org.apache.cordova.plugin.softkeyboard \
-    #org.apache.cordova.device-motion \
-    #org.apache.cordova.device-orientation \
     #de.appplant.cordova.plugin.local-notification
 
 if [[ $1 == "android" ]]
