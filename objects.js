@@ -4411,8 +4411,10 @@ StageMorph.prototype.drawNew = function () {
 };
 
 StageMorph.prototype.drawOn = function (aCanvas, aRect) {
+    var map = document.getElementById('map');
+
     // make sure to draw the pen trails canvas as well
-    var rectangle, area, delta, src, context, w, h, sl, st, ws, hs;
+    var rectangle, area, delta, src, w, h, sl, st;
     if (!this.isVisible) {
         return null;
     }
@@ -4421,8 +4423,6 @@ StageMorph.prototype.drawOn = function (aCanvas, aRect) {
     if (area.extent().gt(new Point(0, 0))) {
         delta = this.position().neg();
         src = area.copy().translateBy(delta).round();
-        context = aCanvas.getContext('2d');
-        context.globalAlpha = this.alpha;
 
         sl = src.left();
         st = src.top();
@@ -4432,51 +4432,10 @@ StageMorph.prototype.drawOn = function (aCanvas, aRect) {
         if (w < 1 || h < 1) {
             return null;
         }
-        context.drawImage(
-            this.image,
-            src.left(),
-            src.top(),
-            w,
-            h,
-            area.left(),
-            area.top(),
-            w,
-            h
-        );
-
-        // pen trails
-        ws = w / this.scale;
-        hs = h / this.scale;
-        context.save();
-        context.scale(this.scale, this.scale);
-        try {
-            context.drawImage(
-                this.penTrails(),
-                src.left() / this.scale,
-                src.top() / this.scale,
-                ws,
-                hs,
-                area.left() / this.scale,
-                area.top() / this.scale,
-                ws,
-                hs
-            );
-        } catch (err) { // sometimes triggered only by Firefox
-            // console.log(err);
-            context.restore();
-            context.drawImage(
-                this.penTrails(),
-                0,
-                0,
-                this.dimensions.x,
-                this.dimensions.y,
-                this.left(),
-                this.top(),
-                this.dimensions.x * this.scale,
-                this.dimensions.y * this.scale
-            );
-        }
-        context.restore();
+        map.style.width = w + 'px';
+        map.style.height = h + 'px';
+        map.style.left = area.left() + 'px';
+        map.style.top = area.top() + 'px';
     }
 };
 
