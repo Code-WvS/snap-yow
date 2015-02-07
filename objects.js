@@ -4437,30 +4437,14 @@ StageMorph.prototype.drawNew = function () {
 
 StageMorph.prototype.drawOn = function (aCanvas, aRect) {
     var map = document.getElementById('map');
-    var rectangle, area, delta, src, w, h, sl, st;
-    if (!this.isVisible) {
-        return null;
-    }
+    var rectangle, area;
     rectangle = aRect || this.bounds;
     area = rectangle.intersect(this.bounds).round();
-    if (area.extent().gt(new Point(0, 0))) {
-        delta = this.position().neg();
-        src = area.copy().translateBy(delta).round();
-
-        sl = src.left();
-        st = src.top();
-        w = Math.min(src.width(), this.image.width - sl);
-        h = Math.min(src.height(), this.image.height - st);
-
-        if (w < 1 || h < 1) {
-            return null;
-        }
-        map.style.width = this.dimensions.x * this.scale + 'px';
-        map.style.height = this.dimensions.y * this.scale + 'px';
-        map.style.left = area.left() + 'px';
-        map.style.top = area.top() + 'px';
-        window.map.invalidateSize();
-    }
+    map.style.width = this.dimensions.x * this.scale + 'px';
+    map.style.height = this.dimensions.y * this.scale + 'px';
+    map.style.left = area.left() + 'px';
+    map.style.top = area.top() + 'px';
+    window.map.invalidateSize();
 };
 
 StageMorph.prototype.clearPenTrails = function () {
