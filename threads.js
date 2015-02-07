@@ -2626,6 +2626,54 @@ Process.prototype.reportTimer = function () {
     return 0;
 };
 
+Process.prototype.reportLocation = function (name) {
+    var myself = this;
+
+    if (!myself.context.position) {
+        myself.context.position = [];
+
+        if (!navigator.geolocation) {
+            myself.handleError({name: 'Location',
+                message: 'navigator.geolocation is not supported'});
+        }
+
+        navigator.geolocation.getCurrentPosition(
+            function (pos) {
+                myself.context.position = [
+                    pos.coords.latitude, pos.coords.longitude];
+            },
+            function (err) {
+                console.log(err);
+                myself.handleError({name: 'Location', message: err.message});
+            },
+            { enableHightAccuracy: true, timeout: 5000, maximumAge: 0}
+        );
+    } else {
+        if (myself.context.position.length == 2) {
+            return new List(myself.context.position);
+        }
+    }
+
+    this.pushContext('doYield');
+    this.pushContext();
+};
+
+Process.prototype.focusMap = function (pos, zoom) {
+    if (pos.contents.length != 2) {
+        this.handleError({name: 'Location',
+            message: 'expecting a list of latitude/longitude'});
+    }
+    window.map.setView(pos.contents, zoom);
+};
+
+Process.prototype.addMarker = function (pos) {
+    if (pos.contents.length != 2) {
+        this.handleError({name: 'Location',
+            message: 'expecting a list of latitude/longitude'});
+    }
+    L.marker(pos.contents).addTo(window.map);
+};
+
 // Process Dates and times in Snap
 // Map block options to built-in functions
 var dateMap = {

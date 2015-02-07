@@ -22,7 +22,7 @@
         <script type="text/javascript" src="cloud.js"></script>
         <script type="text/javascript" src="sha512.js"></script>
         <script type="text/javascript">
-            var world, map, layer;
+            var world;
             window.onload = function () {
                 world = new WorldMorph(document.getElementById('world'));
                 world.worldCanvas.focus();
@@ -36,8 +36,13 @@
     </head>
     <body style="margin: 0;">
         <canvas id="world" tabindex="1" style="position: absolute;"></canvas>
-        <div id="map" style="position: absolute;" />
+        <div id="map" style="position: absolute; width: 480px; height: 360px;" />
+        <!-- set initial size to 480x360 or the map will not load properly -->
         <script type="text/javascript">
+                var map, layer;
+                window.map = map;
+                window.layer = layer;
+
                 map = L.map('map').setView([51.505, -0.09], 13);
                 layer = L.tileLayer('http://{s}.tile.osm.org/{z}/{x}/{y}.png', {
                             attribution: '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'

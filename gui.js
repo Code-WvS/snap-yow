@@ -212,7 +212,7 @@ IDE_Morph.prototype.init = function (isAutoFill) {
     this.globalVariables = new VariableFrame();
     this.currentSprite = new SpriteMorph(this.globalVariables);
     this.sprites = new List([this.currentSprite]);
-    this.currentCategory = 'motion';
+    this.currentCategory = 'map';
     this.currentTab = 'scripts';
     this.projectName = '';
     this.projectNotes = '';
@@ -3526,7 +3526,7 @@ IDE_Morph.prototype.userSetBlocksScale = function () {
         action;
 
     scrpt = new CommandBlockMorph();
-    scrpt.color = SpriteMorph.prototype.blockColor.motion;
+    scrpt.color = SpriteMorph.prototype.blockColor.map;
     scrpt.setSpec(localize('build'));
     blck = new CommandBlockMorph();
     blck.color = SpriteMorph.prototype.blockColor.sound;

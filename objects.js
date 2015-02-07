@@ -155,7 +155,7 @@ SpriteMorph.uber = PenMorph.prototype;
 
 SpriteMorph.prototype.categories =
     [
-        'motion',
+        'map',
         'control',
         'looks',
         'sensing',
@@ -168,7 +168,7 @@ SpriteMorph.prototype.categories =
     ];
 
 SpriteMorph.prototype.blockColor = {
-    motion : new Color(74, 108, 212),
+    map : new Color(74, 108, 212),
     looks : new Color(143, 86, 227),
     sound : new Color(207, 74, 217),
     pen : new Color(0, 161, 120),
@@ -201,6 +201,24 @@ SpriteMorph.prototype.bubbleMaxTextWidth = 130;
 
 SpriteMorph.prototype.initBlocks = function () {
     SpriteMorph.prototype.blocks = {
+
+        // Map (Snap! in Your Own World)
+        reportLocation: {
+            type: 'reporter',
+            category: 'map',
+            spec: 'current location'
+        },
+        focusMap: {
+            type: 'command',
+            category: 'map',
+            spec: 'set focus to %l with zoom %n',
+            defaults: [null, 12]
+        },
+        addMarker: {
+            type: 'command',
+            category: 'map',
+            spec: 'add a marker to %l'
+        },
 
         // Motion
         forward: {
@@ -1626,7 +1644,7 @@ SpriteMorph.prototype.variableBlock = function (varName) {
 
 SpriteMorph.prototype.blockTemplates = function (category) {
     var blocks = [], myself = this, varNames, button,
-        cat = category || 'motion', txt;
+        cat = category || 'map', txt;
 
     function block(selector) {
         if (StageMorph.prototype.hiddenPrimitives[selector]) {
@@ -1702,7 +1720,13 @@ SpriteMorph.prototype.blockTemplates = function (category) {
         }
     }
 
-    if (cat === 'motion') {
+    if (cat === 'map') {
+
+        blocks.push(block('reportLocation'));
+        blocks.push(block('focusMap'));
+        blocks.push(block('addMarker'));
+
+    } /* else if (cat === 'motion') {
 
         blocks.push(block('forward'));
         blocks.push(block('turn'));
@@ -1729,7 +1753,7 @@ SpriteMorph.prototype.blockTemplates = function (category) {
         blocks.push(watcherToggle('direction'));
         blocks.push(block('direction'));
 
-    } else if (cat === 'looks') {
+    } */ else if (cat === 'looks') {
 
         blocks.push(block('doSwitchToCostume'));
         blocks.push(block('doWearNextCostume'));
@@ -1912,6 +1936,7 @@ SpriteMorph.prototype.blockTemplates = function (category) {
         blocks.push(block('doSetFastTracking'));
         blocks.push('-');
         blocks.push(block('reportDate'));
+        blocks.push(block('reportLocation'));
 
     // for debugging: ///////////////
 
@@ -4828,7 +4853,7 @@ StageMorph.prototype.removeAllClones = function () {
 
 StageMorph.prototype.blockTemplates = function (category) {
     var blocks = [], myself = this, varNames, button,
-        cat = category || 'motion', txt;
+        cat = category || 'map', txt;
 
     function block(selector) {
         if (myself.hiddenPrimitives[selector]) {
@@ -4898,7 +4923,13 @@ StageMorph.prototype.blockTemplates = function (category) {
         }
     }
 
-    if (cat === 'motion') {
+    if (cat === 'map') {
+
+        blocks.push(block('reportLocation'));
+        blocks.push(block('focusMap'));
+        blocks.push(block('addMarker'));
+
+    } /* else if (cat === 'motion') {
 
         txt = new TextMorph(localize(
             'Stage selected:\nno motion primitives'
@@ -4907,7 +4938,7 @@ StageMorph.prototype.blockTemplates = function (category) {
         txt.setColor(this.paletteTextColor);
         blocks.push(txt);
 
-    } else if (cat === 'looks') {
+    } */ else if (cat === 'looks') {
 
         blocks.push(block('doSwitchToCostume'));
         blocks.push(block('doWearNextCostume'));
@@ -5054,6 +5085,7 @@ StageMorph.prototype.blockTemplates = function (category) {
         blocks.push(block('doSetFastTracking'));
         blocks.push('-');
         blocks.push(block('reportDate'));
+        blocks.push(block('reportLocation'));
 
     // for debugging: ///////////////
 
