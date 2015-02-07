@@ -4437,8 +4437,6 @@ StageMorph.prototype.drawNew = function () {
 
 StageMorph.prototype.drawOn = function (aCanvas, aRect) {
     var map = document.getElementById('map');
-
-    // make sure to draw the pen trails canvas as well
     var rectangle, area, delta, src, w, h, sl, st;
     if (!this.isVisible) {
         return null;
@@ -4457,10 +4455,11 @@ StageMorph.prototype.drawOn = function (aCanvas, aRect) {
         if (w < 1 || h < 1) {
             return null;
         }
-        map.style.width = w + 'px';
-        map.style.height = h + 'px';
+        map.style.width = this.dimensions.x * this.scale + 'px';
+        map.style.height = this.dimensions.y * this.scale + 'px';
         map.style.left = area.left() + 'px';
         map.style.top = area.top() + 'px';
+        window.map.invalidateSize();
     }
 };
 
