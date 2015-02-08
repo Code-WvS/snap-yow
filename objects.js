@@ -215,6 +215,7 @@ SpriteMorph.prototype.initBlocks = function () {
             defaults: [null, 12]
         },
         addMarker: {
+            dev: true,
             type: 'command',
             category: 'map',
             spec: 'add a marker to %l'
@@ -1358,6 +1359,16 @@ SpriteMorph.prototype.init = function (globals) {
     this.isDraggable = true;
     this.isDown = false;
 
+    // Snap! - YOW code
+    this.icon = L.icon({
+        iconUrl: 'images/marker-icon.png',
+        iconRetinaUrl: 'images/marker-icon-2x.png',
+        shadowUrl: 'images/marker-shadow.png'
+    });
+    this.geoposition = window.map.getCenter();
+    this.marker = L.marker(this.geoposition, {icon: this.icon, title: this.name});
+    this.marker.addTo(window.map);
+
     this.heading = 90;
     this.changed();
     this.drawNew();
@@ -1724,7 +1735,10 @@ SpriteMorph.prototype.blockTemplates = function (category) {
 
         blocks.push(block('reportLocation'));
         blocks.push(block('focusMap'));
-        blocks.push(block('addMarker'));
+
+        //if (this.world().isDevMode) {
+            blocks.push(block('addMarker'));
+        //}
 
     } /* else if (cat === 'motion') {
 
@@ -4910,7 +4924,9 @@ StageMorph.prototype.blockTemplates = function (category) {
 
         blocks.push(block('reportLocation'));
         blocks.push(block('focusMap'));
-        blocks.push(block('addMarker'));
+        if (this.world().isDevMode) {
+            blocks.push(block('addMarker'));
+        }
 
     } /* else if (cat === 'motion') {
 

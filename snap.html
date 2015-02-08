@@ -21,35 +21,43 @@
         <script type="text/javascript" src="locale.js"></script>
         <script type="text/javascript" src="cloud.js"></script>
         <script type="text/javascript" src="sha512.js"></script>
-        <script type="text/javascript">
-            var world;
-            window.onload = function () {
-                world = new WorldMorph(document.getElementById('world'));
-                world.worldCanvas.focus();
-                new IDE_Morph().openIn(world);
-                setInterval(loop, 10);
-            };
-            function loop() {
-                world.doOneCycle();
-            }
-        </script>
     </head>
     <body style="margin: 0;">
         <canvas id="world" tabindex="1" style="position: absolute;"></canvas>
         <div id="map" style="position: absolute; width: 480px; height: 360px;" />
         <!-- set initial size to 480x360 or the map will not load properly -->
         <script type="text/javascript">
-                var map, layer;
+                var world, map, layer;
+
+                function loop() {
+                    world.doOneCycle();
+                }
+
+                function setGlobalPosition (e) {
+                    window.geoposition = e.latlng;
+                }
+
+                function startYOW (e) {
+                    map.on('locationfound', setGlobalPosition);
+                    map.locate({watch: true, enableHighAccuracy: true});
+
+                    new OSMBuildings(map).load();
+
+                    world = new WorldMorph(document.getElementById('world'));
+                    world.worldCanvas.focus();
+                    new IDE_Morph().openIn(world);
+                    setInterval(loop, 10);
+                }
+
                 window.map = map;
                 window.layer = layer;
 
                 map = L.map('map');
-                map.locate({setView: true, maxZoom: 16});
+                map.on('locationfound', startYOW);
+                map.locate({setView: true});
                 layer = L.tileLayer('http://{s}.tile.osm.org/{z}/{x}/{y}.png', {
                             attribution: '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
                 }).addTo(map);
-
-                new OSMBuildings(map).load();
         </script>
     </body>
 </html>
