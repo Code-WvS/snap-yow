@@ -1312,6 +1312,11 @@ SnapSerializer.prototype.openProject = function (project, ide) {
     var stage = ide.stage,
         sprites = [],
         sprite;
+
+    // recreate all Sprite markers (Snap-YOW)
+    window.map.removeLayer(window.spriteGroup);
+    window.spriteGroup = L.layerGroup().addTo(window.map);
+
     if (!project || !project.stage) {
         return;
     }

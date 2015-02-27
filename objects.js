@@ -1336,8 +1336,8 @@ SpriteMorph.prototype.init = function (globals) {
     this.variables = new VariableFrame(globals || null, this);
     this.scripts = new ScriptsMorph(this);
     this.customBlocks = [];
-    this.costume = new Costume(window.defaultCostume, "marker");
-    this.costumes = new List([this.costume]);
+    this.costumes = new List();
+    this.costume = null;
     this.sounds = new List();
     this.normalExtent = new Point(60, 60); // only for costume-less situation
     this.scale = 1;
@@ -1377,7 +1377,12 @@ SpriteMorph.prototype.init = function (globals) {
     this.isDown = false;
 
     // Snap! - YOW code
-    this.geoposition = window.map.getCenter();
+    var markerCostume = new Costume(window.defaultCostume, "marker-" + this.name);
+    this.costumes.add(markerCostume);
+    this.costume = markerCostume;
+
+    this.geoposition = [window.map.getCenter().lat,
+                        window.map.getCenter().lng];
 
     // TODO this is a bit hacky
     this.marker = L.spriteMarker(this.geoposition);
@@ -2600,6 +2605,7 @@ SpriteMorph.prototype.addCostume = function (costume) {
 };
 
 SpriteMorph.prototype.wearCostume = function (costume) {
+    if (costume == null) return; // Snap! YOW
     var x = this.xPosition ? this.xPosition() : null,
         y = this.yPosition ? this.yPosition() : null,
         isWarped = this.isWarped;
@@ -2671,7 +2677,7 @@ SpriteMorph.prototype.doSwitchToCostume = function (id) {
             (id instanceof Array ? id[0] : null)
         )
     ) {
-        this.costume = new Costume(window.defaultCostume, "marker");
+        this.costume = null;
     } else {
         if (id === -1) {
             this.doWearPreviousCostume();
@@ -2683,7 +2689,7 @@ SpriteMorph.prototype.doSwitchToCostume = function (id) {
         if (costume === null) {
             num = parseFloat(id);
             if (num === 0) {
-                this.costume = new Costume(window.defaultCostume, "marker");
+                this.costume = null;
             } else {
                 costume = arr[num - 1] || null;
             }
