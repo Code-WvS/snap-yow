@@ -55,7 +55,7 @@
                     window.geoposition = e.latlng;
                 }
 
-                function startYOW (e) {
+                function startYOW () {
                     new OSMBuildings(map).load();
 
                     window.spriteGroup = spriteGroup;
@@ -90,7 +90,10 @@
                 window.map = map;
                 window.layer = layer;
 
-                map = L.map('map');
+                map = L.map('map', {
+                    keyboard: false
+                });
+                map.on('mouseover', function() {document.getElementById('world').focus();}); 
                 map.on('locationfound', loadDefaultCostume);
                 map.locate({setView: true});
                 layer = L.tileLayer('http://{s}.tile.osm.org/{z}/{x}/{y}.png', {
