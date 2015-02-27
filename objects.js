@@ -237,6 +237,13 @@ SpriteMorph.prototype.initBlocks = function () {
             category: 'map',
             spec: 'move to %l'
         },
+        forward: {
+            only: SpriteMorph,
+            type: 'command',
+            category: 'map',
+            spec: 'move %n meters',
+            defaults: [2]
+        },
         turn: {
             only: SpriteMorph,
             type: 'command',
@@ -265,13 +272,6 @@ SpriteMorph.prototype.initBlocks = function () {
         },
 
         // Motion
-        forward: {
-            only: SpriteMorph,
-            type: 'command',
-            category: 'motion',
-            spec: 'move %n steps',
-            defaults: [10]
-        },
         doFaceTowards: {
             only: SpriteMorph,
             type: 'command',
@@ -1802,6 +1802,7 @@ SpriteMorph.prototype.blockTemplates = function (category) {
         //}
 
         blocks.push('-');
+        blocks.push(block('forward'));
         blocks.push(block('turn'));
         blocks.push(block('turnLeft'));
         blocks.push(block('setHeading'));
@@ -1809,25 +1810,11 @@ SpriteMorph.prototype.blockTemplates = function (category) {
         blocks.push(block('direction'));
     } /* else if (cat === 'motion') {
 
-        blocks.push(block('forward'));
-        blocks.push('-');
         blocks.push(block('doFaceTowards'));
         blocks.push('-');
-        blocks.push(block('gotoXY'));
         blocks.push(block('doGotoObject'));
         blocks.push(block('doGlide'));
         blocks.push('-');
-        blocks.push(block('changeXPosition'));
-        blocks.push(block('setXPosition'));
-        blocks.push(block('changeYPosition'));
-        blocks.push(block('setYPosition'));
-        blocks.push('-');
-        blocks.push(block('bounceOffEdge'));
-        blocks.push('-');
-        blocks.push(watcherToggle('xPosition'));
-        blocks.push(block('xPosition'));
-        blocks.push(watcherToggle('yPosition'));
-        blocks.push(block('yPosition'));
 
     } */ else if (cat === 'looks') {
 
@@ -3383,6 +3370,20 @@ SpriteMorph.prototype.reportMyLocation = function () {
     return new List([this.geoposition.lat, this.geoposition.lng]);
 };
 
+SpriteMorph.prototype.forward = function (meters) {
+    // geoposition[0] is lat, geoposition[1] is lon
+    // FIXME this is an approximation
+    var kilometers = meters / 1000;
+    var diffLat, diffLon;
+    diffLat = Math.cos(radians(this.heading)) * (1 / 110.54 * kilometers);
+    diffLon = Math.sin(radians(this.heading))
+        * (1 / (111.32 * Math.cos(radians(this.geoposition[0]))) * kilometers);
+
+    this.geoposition = [this.geoposition[0] + diffLat,
+            this.geoposition[1] + diffLon];
+    this.updateMarker();
+};
+
 // SpriteMorph motion primitives
 
 Morph.prototype.setPosition = function (aPoint, justMe) {
@@ -3392,22 +3393,6 @@ Morph.prototype.setPosition = function (aPoint, justMe) {
     if ((delta.x !== 0) || (delta.y !== 0)) {
         this.moveBy(delta, justMe);
     }
-};
-
-SpriteMorph.prototype.forward = function (steps) {
-    var dest,
-        dist = steps * this.parent.scale || 0;
-
-    if (dist >= 0) {
-        dest = this.position().distanceAngle(dist, this.heading);
-    } else {
-        dest = this.position().distanceAngle(
-            Math.abs(dist),
-            (this.heading - 180)
-        );
-    }
-    this.setPosition(dest);
-    this.positionTalkBubble();
 };
 
 SpriteMorph.prototype.setHeading = function (degrees) {
