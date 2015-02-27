@@ -1400,7 +1400,10 @@ SpriteMorph.prototype.updateMarker = function () {
     // sadly, the name can not be changed on the fly, so the element has to be recreated
     // TODO: XSS? Extend L.Icon?
     if (!this.marker) return;
+    var myself = this;
+
     window.spriteGroup.removeLayer(this.marker);
+
     this.icon = L.divIcon({
         className: 'snap-sprite',
         html: '<div id="icon-' + this.name + '"></div>',
@@ -1408,6 +1411,10 @@ SpriteMorph.prototype.updateMarker = function () {
         iconAnchor: [this.rotationOffset.x, this.rotationOffset.y]
     });
     this.marker = L.spriteMarker(this.geoposition, {icon: this.icon, title: this.name});
+
+    this.marker.on('click', function () {
+        myself.mouseClickLeft();
+    });
 
     facing = this.rotationStyle ? this.heading : 90;
     if (this.rotationStyle === 2) {
