@@ -213,6 +213,12 @@ SpriteMorph.prototype.initBlocks = function () {
             category: 'map',
             spec: 'my location'
         },
+        findLocation: {
+            type: 'reporter',
+            category: 'map',
+            spec: 'location of %s',
+            defaults: ['Tiergarten Berlin']
+        },
         focusMap: {
             type: 'command',
             category: 'map',
@@ -1770,6 +1776,8 @@ SpriteMorph.prototype.blockTemplates = function (category) {
 
     if (cat === 'map') {
         blocks.push(block('reportUserLocation'));
+        blocks.push(block('reportMyLocation'));
+        blocks.push(block('findLocation'));
         blocks.push(block('focusMap'));
         blocks.push(block('moveTo'));
 
@@ -3353,6 +3361,10 @@ SpriteMorph.prototype.nestingBounds = function () {
 SpriteMorph.prototype.moveTo = function (pos) {
     this.geoposition = pos.contents;
     this.updateMarker();
+};
+
+SpriteMorph.prototype.reportMyLocation = function () {
+    return new List([this.geoposition.lat, this.geoposition.lng]);
 };
 
 // SpriteMorph motion primitives

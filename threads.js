@@ -2638,6 +2638,33 @@ Process.prototype.addMarker = function (pos) {
     L.marker(pos.contents).addTo(window.map);
 };
 
+Process.prototype.findLocation = function (searchString) {
+    var myself = this;
+
+    if (!myself.context.jsonpScript) {
+        window.OSM_JSONP_Callback = function (data) {
+            myself.context.json = data;
+            window.OSM_JSONP_Callback = undefined;
+        };
+        myself.context.jsonpScript = document.createElement('script');
+        myself.context.jsonpScript.src =
+            'https://nominatim.openstreetmap.org/search'
+            + '?format=json&json_callback=OSM_JSONP_Callback'
+            + '&addressdetails=0&limit=1'
+            + '&q=' + myself.inputOption(searchString);
+        document.getElementsByTagName('HEAD')[0]
+            .appendChild(myself.context.jsonpScript);
+    } else {
+        if (myself.context.json) {
+            return new List([myself.context.json[0].lat,
+                    myself.context.json[0].lon]);
+        }
+    }
+
+    this.pushContext('doYield');
+    this.pushContext();
+}
+
 // Process Dates and times in Snap
 // Map block options to built-in functions
 var dateMap = {
