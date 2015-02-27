@@ -203,10 +203,15 @@ SpriteMorph.prototype.initBlocks = function () {
     SpriteMorph.prototype.blocks = {
 
         // Map (Snap! in Your Own World)
-        reportLocation: {
+        reportUserLocation: {
             type: 'reporter',
             category: 'map',
-            spec: 'current location'
+            spec: 'current user location'
+        },
+        reportMyLocation: {
+            type: 'reporter',
+            category: 'map',
+            spec: 'my location'
         },
         focusMap: {
             type: 'command',
@@ -218,7 +223,39 @@ SpriteMorph.prototype.initBlocks = function () {
             dev: true,
             type: 'command',
             category: 'map',
-            spec: 'add a marker to %l'
+            spec: 'debug: add a marker to %l'
+        },
+        moveTo: {
+            only: SpriteMorph,
+            type: 'command',
+            category: 'map',
+            spec: 'move to %l'
+        },
+        turn: {
+            only: SpriteMorph,
+            type: 'command',
+            category: 'map',
+            spec: 'turn %clockwise %n degrees',
+            defaults: [15]
+        },
+        turnLeft: {
+            only: SpriteMorph,
+            type: 'command',
+            category: 'map',
+            spec: 'turn %counterclockwise %n degrees',
+            defaults: [15]
+        },
+        setHeading: {
+            only: SpriteMorph,
+            type: 'command',
+            category: 'map',
+            spec: 'point in direction %dir'
+        },
+        direction: {
+            only: SpriteMorph,
+            type: 'reporter',
+            category: 'map',
+            spec: 'direction'
         },
 
         // Motion
@@ -228,26 +265,6 @@ SpriteMorph.prototype.initBlocks = function () {
             category: 'motion',
             spec: 'move %n steps',
             defaults: [10]
-        },
-        turn: {
-            only: SpriteMorph,
-            type: 'command',
-            category: 'motion',
-            spec: 'turn %clockwise %n degrees',
-            defaults: [15]
-        },
-        turnLeft: {
-            only: SpriteMorph,
-            type: 'command',
-            category: 'motion',
-            spec: 'turn %counterclockwise %n degrees',
-            defaults: [15]
-        },
-        setHeading: {
-            only: SpriteMorph,
-            type: 'command',
-            category: 'motion',
-            spec: 'point in direction %dir'
         },
         doFaceTowards: {
             only: SpriteMorph,
@@ -320,12 +337,6 @@ SpriteMorph.prototype.initBlocks = function () {
             type: 'reporter',
             category: 'motion',
             spec: 'y position'
-        },
-        direction: {
-            only: SpriteMorph,
-            type: 'reporter',
-            category: 'motion',
-            spec: 'direction'
         },
 
         // Looks
@@ -1319,8 +1330,8 @@ SpriteMorph.prototype.init = function (globals) {
     this.variables = new VariableFrame(globals || null, this);
     this.scripts = new ScriptsMorph(this);
     this.customBlocks = [];
-    this.costumes = new List();
-    this.costume = null;
+    this.costume = new Costume(window.defaultCostume, "marker");
+    this.costumes = new List([this.costume]);
     this.sounds = new List();
     this.normalExtent = new Point(60, 60); // only for costume-less situation
     this.scale = 1;
@@ -1360,20 +1371,45 @@ SpriteMorph.prototype.init = function (globals) {
     this.isDown = false;
 
     // Snap! - YOW code
-    this.icon = L.icon({
-        iconUrl: 'images/marker-icon.png',
-        iconRetinaUrl: 'images/marker-icon-2x.png',
-        shadowUrl: 'images/marker-shadow.png'
-    });
     this.geoposition = window.map.getCenter();
-    this.marker = L.marker(this.geoposition, {icon: this.icon, title: this.name});
-    this.marker.addTo(window.map);
+
+    // TODO this is a bit hacky
+    this.marker = L.spriteMarker(this.geoposition);
+    this.marker.addTo(window.spriteGroup);
+    this.updateMarker();
 
     this.heading = 90;
     this.changed();
     this.drawNew();
     this.changed();
 };
+
+SpriteMorph.prototype.updateMarker = function () {
+    // sadly, the name can not be changed on the fly, so the element has to be recreated
+    // TODO: XSS? Extend L.Icon?
+    if (!this.marker) return;
+    window.spriteGroup.removeLayer(this.marker);
+    this.icon = L.divIcon({
+        className: 'snap-sprite',
+        html: '<div id="icon-' + this.name + '"></div>',
+        iconSize: [this.costume.contents.width, this.costume.contents.height],
+        iconAnchor: [this.rotationOffset.x, this.rotationOffset.y]
+    });
+    this.marker = L.spriteMarker(this.geoposition, {icon: this.icon, title: this.name});
+    this.marker.setAngle(this.heading - 90);
+    this.marker.addTo(window.spriteGroup);
+    document.getElementById('icon-' + this.name).appendChild(this.costume.contents);
+};
+
+/*
+ *  // for later
+    this.icon = new L.Icon.Canvas({
+            iconSize: [this.costume.contents.width, this.costume.contents.height]});
+    var myself = this;
+    this.icon.draw = function(ctx, w, h) {ctx.drawImage(myself.costume.contents, 0, 0);};
+    this.marker = L.marker(this.geoposition, {icon: this.icon, title: this.name});
+    this.marker.addTo(window.spriteGroup);
+*/
 
 // SpriteMorph duplicating (fullCopy)
 
@@ -1554,6 +1590,7 @@ SpriteMorph.prototype.drawNew = function () {
         }
     }
     this.version = Date.now();
+    this.updateMarker(); // Snap! YOW
 };
 
 SpriteMorph.prototype.endWarp = function () {
@@ -1732,21 +1769,24 @@ SpriteMorph.prototype.blockTemplates = function (category) {
     }
 
     if (cat === 'map') {
-
-        blocks.push(block('reportLocation'));
+        blocks.push(block('reportUserLocation'));
         blocks.push(block('focusMap'));
+        blocks.push(block('moveTo'));
 
         //if (this.world().isDevMode) {
             blocks.push(block('addMarker'));
         //}
 
+        blocks.push('-');
+        blocks.push(block('turn'));
+        blocks.push(block('turnLeft'));
+        blocks.push(block('setHeading'));
+        blocks.push(watcherToggle('direction'));
+        blocks.push(block('direction'));
     } /* else if (cat === 'motion') {
 
         blocks.push(block('forward'));
-        blocks.push(block('turn'));
-        blocks.push(block('turnLeft'));
         blocks.push('-');
-        blocks.push(block('setHeading'));
         blocks.push(block('doFaceTowards'));
         blocks.push('-');
         blocks.push(block('gotoXY'));
@@ -1764,8 +1804,6 @@ SpriteMorph.prototype.blockTemplates = function (category) {
         blocks.push(block('xPosition'));
         blocks.push(watcherToggle('yPosition'));
         blocks.push(block('yPosition'));
-        blocks.push(watcherToggle('direction'));
-        blocks.push(block('direction'));
 
     } */ else if (cat === 'looks') {
 
@@ -1950,7 +1988,7 @@ SpriteMorph.prototype.blockTemplates = function (category) {
         blocks.push(block('doSetFastTracking'));
         blocks.push('-');
         blocks.push(block('reportDate'));
-        blocks.push(block('reportLocation'));
+        blocks.push(block('reportUserLocation'));
 
     // for debugging: ///////////////
 
@@ -2615,7 +2653,7 @@ SpriteMorph.prototype.doSwitchToCostume = function (id) {
             (id instanceof Array ? id[0] : null)
         )
     ) {
-        costume = null;
+        this.costume = new Costume(window.defaultCostume, "marker");
     } else {
         if (id === -1) {
             this.doWearPreviousCostume();
@@ -2627,7 +2665,7 @@ SpriteMorph.prototype.doSwitchToCostume = function (id) {
         if (costume === null) {
             num = parseFloat(id);
             if (num === 0) {
-                costume = null;
+                this.costume = new Costume(window.defaultCostume, "marker");
             } else {
                 costume = arr[num - 1] || null;
             }
@@ -3308,6 +3346,13 @@ SpriteMorph.prototype.nestingBounds = function () {
         }
     });
     return result;
+};
+
+// SpriteMorph YOW map primitives
+
+SpriteMorph.prototype.moveTo = function (pos) {
+    this.geoposition = pos.contents;
+    this.updateMarker();
 };
 
 // SpriteMorph motion primitives
@@ -4451,13 +4496,10 @@ StageMorph.prototype.drawNew = function () {
 
 StageMorph.prototype.drawOn = function (aCanvas, aRect) {
     var map = document.getElementById('map');
-    var rectangle, area;
-    rectangle = aRect || this.bounds;
-    area = rectangle.intersect(this.bounds).round();
     map.style.width = this.dimensions.x * this.scale + 'px';
     map.style.height = this.dimensions.y * this.scale + 'px';
-    map.style.left = area.left() + 'px';
-    map.style.top = area.top() + 'px';
+    map.style.left = this.left() + 'px';
+    map.style.top = this.top() + 'px';
     window.map.invalidateSize();
 };
 
@@ -4922,7 +4964,7 @@ StageMorph.prototype.blockTemplates = function (category) {
 
     if (cat === 'map') {
 
-        blocks.push(block('reportLocation'));
+        blocks.push(block('reportUserLocation'));
         blocks.push(block('focusMap'));
         if (this.world().isDevMode) {
             blocks.push(block('addMarker'));
@@ -5084,7 +5126,7 @@ StageMorph.prototype.blockTemplates = function (category) {
         blocks.push(block('doSetFastTracking'));
         blocks.push('-');
         blocks.push(block('reportDate'));
-        blocks.push(block('reportLocation'));
+        blocks.push(block('reportUserLocation'));
 
     // for debugging: ///////////////
 

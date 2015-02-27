@@ -211,6 +211,10 @@ IDE_Morph.prototype.init = function (isAutoFill) {
     this.serializer = new SnapSerializer();
 
     this.globalVariables = new VariableFrame();
+
+    // recreate all Sprite markers (Snap-YOW)
+    window.spriteGroup = L.layerGroup().addTo(window.map);
+
     this.currentSprite = new SpriteMorph(this.globalVariables);
     this.sprites = new List([this.currentSprite]);
     this.currentCategory = 'map';
@@ -2797,6 +2801,11 @@ IDE_Morph.prototype.newProject = function () {
         location.hash = '';
     }
     this.globalVariables = new VariableFrame();
+
+    // recreate all Sprite markers (Snap-YOW)
+    window.map.removeLayer(window.spriteGroup);
+    window.spriteGroup = L.layerGroup().addTo(window.map);
+
     this.currentSprite = new SpriteMorph(this.globalVariables);
     this.sprites = new List([this.currentSprite]);
     StageMorph.prototype.dimensions = new Point(480, 360);
