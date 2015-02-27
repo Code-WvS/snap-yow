@@ -6,7 +6,7 @@
         <link rel="shortcut icon" href="favicon.ico">
         <link rel="stylesheet" href="leaflet.css" />
         <script type="text/javascript" src="leaflet.js"></script>
-        <script type="text/javascript" src="OSMBuildings-Leaflet.js"></script>
+        <script type="text/javascript" src="osmbuildings/dist/OSMBuildings-Leaflet.js"></script>
         <script type="text/javascript" src="morphic.js"></script>
         <script type="text/javascript" src="widgets.js"></script>
         <script type="text/javascript" src="blocks.js"></script>
@@ -56,11 +56,6 @@
                 }
 
                 function startYOW (e) {
-                    setGlobalPosition(e);
-                    map.stopLocate();
-                    map.on('locationfound', setGlobalPosition);
-                    map.locate({watch: true, enableHighAccuracy: true});
-
                     new OSMBuildings(map).load();
 
                     window.spriteGroup = spriteGroup;
@@ -74,6 +69,11 @@
 
                 // TODO: this needs to be improved
                 function loadDefaultCostume (e) {
+                    setGlobalPosition(e);
+                    map.stopLocate();
+                    map.on('locationfound', setGlobalPosition);
+                    map.locate({watch: true, enableHighAccuracy: true});
+
                     image = new Image();
                     image.src = 'images/marker-icon.png';
                     image.onload = function () {
