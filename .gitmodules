@@ -1,0 +1,3 @@
+[submodule "osmbuildings"]
+	path = osmbuildings
+	url = https://github.com/kekscom/osmbuildings
