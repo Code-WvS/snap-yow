@@ -1996,7 +1996,6 @@ SpriteMorph.prototype.blockTemplates = function (category) {
         blocks.push(block('doSetFastTracking'));
         blocks.push('-');
         blocks.push(block('reportDate'));
-        blocks.push(block('reportUserLocation'));
 
     // for debugging: ///////////////
 
