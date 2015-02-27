@@ -1391,6 +1391,7 @@ SpriteMorph.prototype.init = function (globals) {
 };
 
 SpriteMorph.prototype.updateMarker = function () {
+    var facing; // actual costume heading based on my rotation style
     // sadly, the name can not be changed on the fly, so the element has to be recreated
     // TODO: XSS? Extend L.Icon?
     if (!this.marker) return;
@@ -1402,7 +1403,17 @@ SpriteMorph.prototype.updateMarker = function () {
         iconAnchor: [this.rotationOffset.x, this.rotationOffset.y]
     });
     this.marker = L.spriteMarker(this.geoposition, {icon: this.icon, title: this.name});
-    this.marker.setAngle(this.heading - 90);
+
+    facing = this.rotationStyle ? this.heading : 90;
+    if (this.rotationStyle === 2) {
+        facing = 90;
+        if ((this.heading > 180 && (this.heading < 360))
+                || (this.heading < 0 && (this.heading > -180))) {
+            facing = -90;
+        }
+    }
+    this.marker.setAngle(facing - 90);
+
     this.marker.addTo(window.spriteGroup);
     document.getElementById('icon-' + this.name).appendChild(this.costume.contents);
 };
