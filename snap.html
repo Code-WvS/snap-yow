@@ -27,22 +27,30 @@
         <div id="map" style="position: absolute; width: 480px; height: 360px;" />
         <!-- set initial size to 480x360 or the map will not load properly -->
         <script type="text/javascript">
-                L.SpriteMarker = L.Marker.extend({
+                L.SpriteIcon = L.Icon.extend({
                     options: {
-                        angle: 0
+                        iconSize: [24, 24],
+                        iconAnchor: [12, 12],
+                        canvas: null,
+                        className: 'leaflet-sprite-icon'
                     },
-                    _setPos: function (pos) {
-                        L.Marker.prototype._setPos.call(this, pos);
-                        this._icon.style[L.DomUtil.TRANSFORM] += ' rotate(' + this.options.angle + 'deg)';
-                        // TODO: set rotation center with transform-origin
+                    createIcon: function () {
+                        this.options.iconSize =
+                            [this.options.canvas.width, this.options.canvas.height];
+                        var copy = document.createElement('canvas');
+                        copy.width = this.options.iconSize[0];
+                        copy.height = this.options.iconSize[1];
+                        var context = copy.getContext('2d');
+                        context.drawImage(this.options.canvas, 0, 0);
+                        this._setIconStyles(copy, 'icon');
+                        return copy;
                     },
-                    setAngle: function (angle) {
-                        this.options.angle = angle;
-                        this.update();
+                    createShadow: function (oldIcon) {
+                        return null;
                     }
                 });
-                L.spriteMarker = function(pos, options) {
-                    return new L.SpriteMarker(pos, options);
+                L.spriteIcon = function (options) {
+                    return new L.SpriteIcon(options);
                 };
 
                 var world, map, layer, spriteGroup, defaultCostume;

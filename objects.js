@@ -1403,49 +1403,35 @@ SpriteMorph.prototype.updateMarker = function () {
     if (!this.marker) return;
     var myself = this;
 
-    window.spriteGroup.removeLayer(this.marker);
-    if (this.markerShown == false) return;
+    if (window.spriteGroup.hasLayer(this.marker)) {
+        // if it is created the first time, it cannot be removed
+        window.spriteGroup.removeLayer(this.marker);
+    }
+    if (this.isVisible == false) return;
 
-    this.icon = L.divIcon({
-        className: 'snap-sprite',
-        html: '<div id="icon-' + this.name + '"></div>',
-        iconSize: [this.image.width, this.image.height],
-        iconAnchor: [this.rotationOffset.x, this.rotationOffset.y]
+    // create a new marker with the sprite as icon
+    this.icon = L.spriteIcon({
+        iconAnchor: [this.rotationOffset.x, this.rotationOffset.y],
+        canvas: this.image
     });
-    this.marker = L.spriteMarker(this.geoposition, {icon: this.icon, title: this.name});
+    this.marker = L.marker([this.xPosition(), this.yPosition()],
+            {icon: this.icon, title: this.name});
 
+    // add event handlers
     this.marker.on('click', function () {
         myself.mouseClickLeft();
     });
 
-    facing = this.rotationStyle ? this.heading : 90;
-    if (this.rotationStyle === 2) {
-        facing = 90;
-        if ((this.heading > 180 && (this.heading < 360))
-                || (this.heading < 0 && (this.heading > -180))) {
-            facing = -90;
-        }
-    }
-    this.marker.setAngle(facing - 90);
+    // apply graphic effects that do not apply to the icon canvas
     this.marker.setOpacity(this.alpha);
     if (this.parent) {
         var layer = this.parent.children.indexOf(this);
         this.marker.setZIndexOffset(layer);
     }
 
+    // display that marker
     this.marker.addTo(window.spriteGroup);
-    document.getElementById('icon-' + this.name).appendChild(this.image);
 };
-
-/*
- *  // for later
-    this.icon = new L.Icon.Canvas({
-            iconSize: [this.costume.contents.width, this.costume.contents.height]});
-    var myself = this;
-    this.icon.draw = function(ctx, w, h) {ctx.drawImage(myself.costume.contents, 0, 0);};
-    this.marker = L.marker(this.geoposition, {icon: this.icon, title: this.name});
-    this.marker.addTo(window.spriteGroup);
-*/
 
 // SpriteMorph duplicating (fullCopy)
 
@@ -2845,17 +2831,15 @@ SpriteMorph.prototype.removeClone = function () {
 */
 
 SpriteMorph.prototype.hide = function () {
-    this.markerShown = false;
-    this.updateMarker();
     SpriteMorph.uber.hide.call(this);
     this.parts.forEach(function (part) {part.hide(); });
+    this.updateMarker();
 };
 
 SpriteMorph.prototype.show = function () {
-    this.markerShown = true;
-    this.updateMarker();
     SpriteMorph.uber.show.call(this);
     this.parts.forEach(function (part) {part.show(); });
+    this.updateMarker();
 };
 
 // SpriteMorph pen color
