@@ -3176,6 +3176,9 @@ SpriteMorph.prototype.clearEffects = function () {
 // SpriteMorph talk bubble
 
 SpriteMorph.prototype.stopTalking = function () {
+    if (window.map.hasLayer(this.popup)) {
+        window.map.removeLayer(this.popup);
+    }
     var bubble = this.talkBubble();
     if (bubble) {bubble.destroy(); }
 };
@@ -3190,6 +3193,13 @@ SpriteMorph.prototype.bubble = function (data, isThought, isQuestion) {
 
     this.stopTalking();
     if (data === '' || isNil(data)) {return; }
+
+    // Snap! YOW
+    this.popup = L.popup()
+        .setLatLng([this.yPosition(), this.xPosition()])
+        .setContent(data)
+        .addTo(window.map);
+
     bubble = new SpriteBubbleMorph(
         data,
         stage ? stage.scale : 1,
