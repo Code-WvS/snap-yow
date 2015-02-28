@@ -5,8 +5,10 @@
         <title>Snap! Build Your Own Blocks. Beta</title>
         <link rel="shortcut icon" href="favicon.ico">
         <link rel="stylesheet" href="leaflet.css" />
+        <link rel="stylesheet" href="Leaflet.Coordinates/dist/Leaflet.Coordinates-0.1.4.css" />
         <script type="text/javascript" src="leaflet.js"></script>
         <script type="text/javascript" src="osmbuildings/dist/OSMBuildings-Leaflet.js"></script>
+        <script type="text/javascript" src="Leaflet.Coordinates/dist/Leaflet.Coordinates-0.1.4.min.js"></script>
         <script type="text/javascript" src="morphic.js"></script>
         <script type="text/javascript" src="widgets.js"></script>
         <script type="text/javascript" src="blocks.js"></script>
@@ -55,7 +57,7 @@
                 };
 
                 // Snap! YOW starts here
-                var world, map, layer, spriteGroup, defaultCostume;
+                var world, map, layer, spriteGroup;
 
                 function loop() {
                     world.doOneCycle();
@@ -80,6 +82,12 @@
 
                 layer = L.tileLayer('http://{s}.tile.osm.org/{z}/{x}/{y}.png', {
                             attribution: '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
+                }).addTo(map);
+                L.control.coordinates({
+                    decimals: 7,
+                    enableUserInput: false,
+                    labelTemplateLng: "Lon {x}",
+                    position: "topright"
                 }).addTo(map);
 
                 // continuously update the local location variable

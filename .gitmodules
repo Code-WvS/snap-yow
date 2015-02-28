@@ -1,3 +1,6 @@
 [submodule "osmbuildings"]
 	path = osmbuildings
 	url = https://github.com/kekscom/osmbuildings
+[submodule "Leaflet.Coordinates"]
+	path = Leaflet.Coordinates
+	url = https://github.com/MrMufflon/Leaflet.Coordinates
