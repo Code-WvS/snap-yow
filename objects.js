@@ -1377,6 +1377,7 @@ SpriteMorph.prototype.init = function (globals) {
     this.isDown = false;
 
     // Snap! - YOW code
+    this.markerShown = true; // changed by show/hide blocks
     var markerCostume = new Costume(window.defaultCostume, "marker-" + this.name);
     this.costumes.add(markerCostume);
     this.costume = markerCostume;
@@ -1403,11 +1404,12 @@ SpriteMorph.prototype.updateMarker = function () {
     var myself = this;
 
     window.spriteGroup.removeLayer(this.marker);
+    if (this.markerShown == false) return;
 
     this.icon = L.divIcon({
         className: 'snap-sprite',
         html: '<div id="icon-' + this.name + '"></div>',
-        iconSize: [this.costume.contents.width, this.costume.contents.height],
+        iconSize: [this.image.width, this.image.height],
         iconAnchor: [this.rotationOffset.x, this.rotationOffset.y]
     });
     this.marker = L.spriteMarker(this.geoposition, {icon: this.icon, title: this.name});
@@ -1425,9 +1427,14 @@ SpriteMorph.prototype.updateMarker = function () {
         }
     }
     this.marker.setAngle(facing - 90);
+    this.marker.setOpacity(this.alpha);
+    if (this.parent) {
+        var layer = this.parent.children.indexOf(this);
+        this.marker.setZIndexOffset(layer);
+    }
 
     this.marker.addTo(window.spriteGroup);
-    document.getElementById('icon-' + this.name).appendChild(this.costume.contents);
+    document.getElementById('icon-' + this.name).appendChild(this.image);
 };
 
 /*
@@ -2838,11 +2845,15 @@ SpriteMorph.prototype.removeClone = function () {
 */
 
 SpriteMorph.prototype.hide = function () {
+    this.markerShown = false;
+    this.updateMarker();
     SpriteMorph.uber.hide.call(this);
     this.parts.forEach(function (part) {part.hide(); });
 };
 
 SpriteMorph.prototype.show = function () {
+    this.markerShown = true;
+    this.updateMarker();
     SpriteMorph.uber.show.call(this);
     this.parts.forEach(function (part) {part.show(); });
 };
@@ -2912,6 +2923,7 @@ SpriteMorph.prototype.comeToFront = function () {
         this.parent.add(this);
         this.changed();
     }
+    this.updateMarker();
 };
 
 SpriteMorph.prototype.goBack = function (layers) {
@@ -2922,6 +2934,7 @@ SpriteMorph.prototype.goBack = function (layers) {
     this.parent.removeChild(this);
     this.parent.children.splice(layer - newLayer, null, this);
     this.parent.changed();
+    this.updateMarker();
 };
 
 // SpriteMorph collision detection optimization
