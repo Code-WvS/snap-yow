@@ -2626,12 +2626,16 @@ Process.prototype.reportTimer = function () {
     return 0;
 };
 
-Process.prototype.reportUserLocation = function () {
-    return new List([window.geoposition.lat, window.geoposition.lng]);
+Process.prototype.userLon = function () {
+    return window.geoposition.lng;
 };
 
-Process.prototype.focusMap = function (pos, zoom) {
-    window.map.setView(pos.contents, zoom);
+Process.prototype.userLat = function () {
+    return window.geoposition.lat;
+};
+
+Process.prototype.focusMap = function (lon, lat, zoom) {
+    window.map.setView([lat, lon], zoom);
 };
 
 Process.prototype.addMarker = function (pos) {

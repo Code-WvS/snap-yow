@@ -155,7 +155,7 @@ SpriteMorph.uber = PenMorph.prototype;
 
 SpriteMorph.prototype.categories =
     [
-        'map',
+        'motion',
         'control',
         'looks',
         'sensing',
@@ -168,7 +168,7 @@ SpriteMorph.prototype.categories =
     ];
 
 SpriteMorph.prototype.blockColor = {
-    map : new Color(74, 108, 212),
+    motion : new Color(74, 108, 212),
     looks : new Color(143, 86, 227),
     sound : new Color(207, 74, 217),
     pen : new Color(0, 161, 120),
@@ -203,75 +203,69 @@ SpriteMorph.prototype.initBlocks = function () {
     SpriteMorph.prototype.blocks = {
 
         // Map (Snap! in Your Own World)
-        reportUserLocation: {
+        userLon: {
             type: 'reporter',
-            category: 'map',
-            spec: 'current user location'
+            category: 'motion',
+            spec: 'user lon'
         },
-        reportMyLocation: {
+        userLat: {
             type: 'reporter',
-            category: 'map',
-            spec: 'my location'
+            category: 'motion',
+            spec: 'user lat'
         },
         findLocation: {
             type: 'reporter',
-            category: 'map',
-            spec: 'location of %s',
+            category: 'motion',
+            spec: 'lat, lon of %s',
             defaults: ['Tiergarten Berlin']
         },
         focusMap: {
             type: 'command',
-            category: 'map',
-            spec: 'set focus to %l with zoom %n',
-            defaults: [null, 12]
+            category: 'motion',
+            spec: 'set focus to lon: %n lat: %n with zoom %n',
+            defaults: [0, 0, 12]
         },
         addMarker: {
             dev: true,
             type: 'command',
-            category: 'map',
+            category: 'motion',
             spec: 'debug: add a marker to %l'
         },
-        moveTo: {
-            only: SpriteMorph,
-            type: 'command',
-            category: 'map',
-            spec: 'move to %l'
-        },
+
+        // Motion
         forward: {
             only: SpriteMorph,
             type: 'command',
-            category: 'map',
+            category: 'motion',
             spec: 'move %n meters',
             defaults: [2]
         },
         turn: {
             only: SpriteMorph,
             type: 'command',
-            category: 'map',
+            category: 'motion',
             spec: 'turn %clockwise %n degrees',
             defaults: [15]
         },
         turnLeft: {
             only: SpriteMorph,
             type: 'command',
-            category: 'map',
+            category: 'motion',
             spec: 'turn %counterclockwise %n degrees',
             defaults: [15]
         },
         setHeading: {
             only: SpriteMorph,
             type: 'command',
-            category: 'map',
+            category: 'motion',
             spec: 'point in direction %dir'
         },
         direction: {
             only: SpriteMorph,
             type: 'reporter',
-            category: 'map',
+            category: 'motion',
             spec: 'direction'
         },
-
-        // Motion
         doFaceTowards: {
             only: SpriteMorph,
             type: 'command',
@@ -282,7 +276,7 @@ SpriteMorph.prototype.initBlocks = function () {
             only: SpriteMorph,
             type: 'command',
             category: 'motion',
-            spec: 'go to x: %n y: %n',
+            spec: 'go to lon: %n lat: %n',
             defaults: [0, 0]
         },
         doGotoObject: {
@@ -295,35 +289,35 @@ SpriteMorph.prototype.initBlocks = function () {
             only: SpriteMorph,
             type: 'command',
             category: 'motion',
-            spec: 'glide %n secs to x: %n y: %n',
+            spec: 'glide %n secs to lon: %n lat: %n',
             defaults: [1, 0, 0]
         },
         changeXPosition: {
             only: SpriteMorph,
             type: 'command',
             category: 'motion',
-            spec: 'change x by %n',
+            spec: 'change lat by %n',
             defaults: [10]
         },
         setXPosition: {
             only: SpriteMorph,
             type: 'command',
             category: 'motion',
-            spec: 'set x to %n',
+            spec: 'set lon to %n',
             defaults: [0]
         },
         changeYPosition: {
             only: SpriteMorph,
             type: 'command',
             category: 'motion',
-            spec: 'change y by %n',
+            spec: 'change lat by %n',
             defaults: [10]
         },
         setYPosition: {
             only: SpriteMorph,
             type: 'command',
             category: 'motion',
-            spec: 'set y to %n',
+            spec: 'set lat to %n',
             defaults: [0]
         },
         bounceOffEdge: {
@@ -336,13 +330,13 @@ SpriteMorph.prototype.initBlocks = function () {
             only: SpriteMorph,
             type: 'reporter',
             category: 'motion',
-            spec: 'x position'
+            spec: 'longitude'
         },
         yPosition: {
             only: SpriteMorph,
             type: 'reporter',
             category: 'motion',
-            spec: 'y position'
+            spec: 'latitude'
         },
 
         // Looks
@@ -1376,20 +1370,6 @@ SpriteMorph.prototype.init = function (globals) {
     this.isDraggable = true;
     this.isDown = false;
 
-    // Snap! - YOW code
-    this.markerShown = true; // changed by show/hide blocks
-    var markerCostume = new Costume(window.defaultCostume, "marker-" + this.name);
-    this.costumes.add(markerCostume);
-    this.costume = markerCostume;
-
-    this.geoposition = [window.map.getCenter().lat,
-                        window.map.getCenter().lng];
-
-    // TODO this is a bit hacky
-    this.marker = L.spriteMarker(this.geoposition);
-    this.marker.addTo(window.spriteGroup);
-    this.updateMarker();
-
     this.heading = 90;
     this.changed();
     this.drawNew();
@@ -1397,11 +1377,9 @@ SpriteMorph.prototype.init = function (globals) {
 };
 
 SpriteMorph.prototype.updateMarker = function () {
-    var facing; // actual costume heading based on my rotation style
-    // sadly, the name can not be changed on the fly, so the element has to be recreated
-    // TODO: XSS? Extend L.Icon?
-    if (!this.marker) return;
     var myself = this;
+
+    if (!this.parent) return; // not loaded yet, xPosition is not available
 
     if (window.spriteGroup.hasLayer(this.marker)) {
         // if it is created the first time, it cannot be removed
@@ -1414,7 +1392,8 @@ SpriteMorph.prototype.updateMarker = function () {
         iconAnchor: [this.rotationOffset.x, this.rotationOffset.y],
         canvas: this.image
     });
-    this.marker = L.marker([this.xPosition(), this.yPosition()],
+    // X position is longitude, Y latitude
+    this.marker = L.marker([this.yPosition(), this.xPosition()],
             {icon: this.icon, title: this.name});
 
     // add event handlers
@@ -1714,7 +1693,7 @@ SpriteMorph.prototype.variableBlock = function (varName) {
 
 SpriteMorph.prototype.blockTemplates = function (category) {
     var blocks = [], myself = this, varNames, button,
-        cat = category || 'map', txt;
+        cat = category || 'motion', txt;
 
     function block(selector) {
         if (StageMorph.prototype.hiddenPrimitives[selector]) {
@@ -1790,33 +1769,42 @@ SpriteMorph.prototype.blockTemplates = function (category) {
         }
     }
 
-    if (cat === 'map') {
-        blocks.push(block('reportUserLocation'));
-        blocks.push(block('reportMyLocation'));
+    if (cat === 'motion') {
+        blocks.push(block('userLon'));
+        blocks.push(block('userLat'));
         blocks.push(block('findLocation'));
         blocks.push(block('focusMap'));
-        blocks.push(block('moveTo'));
 
         //if (this.world().isDevMode) {
             blocks.push(block('addMarker'));
         //}
 
-        blocks.push('-');
+        blocks.push('=');
+
         blocks.push(block('forward'));
         blocks.push(block('turn'));
         blocks.push(block('turnLeft'));
+        blocks.push('-');
         blocks.push(block('setHeading'));
-        blocks.push(watcherToggle('direction'));
-        blocks.push(block('direction'));
-    } /* else if (cat === 'motion') {
-
         blocks.push(block('doFaceTowards'));
         blocks.push('-');
+        blocks.push(block('gotoXY'));
         blocks.push(block('doGotoObject'));
         blocks.push(block('doGlide'));
         blocks.push('-');
+        blocks.push(block('changeXPosition'));
+        blocks.push(block('setXPosition'));
+        blocks.push(block('changeYPosition'));
+        blocks.push(block('setYPosition'));
+        blocks.push('-');
+        blocks.push(watcherToggle('xPosition'));
+        blocks.push(block('xPosition'));
+        blocks.push(watcherToggle('yPosition'));
+        blocks.push(block('yPosition'));
+        blocks.push(watcherToggle('direction'));
+        blocks.push(block('direction'));
 
-    } */ else if (cat === 'looks') {
+    } else if (cat === 'looks') {
 
         blocks.push(block('doSwitchToCostume'));
         blocks.push(block('doWearNextCostume'));
@@ -2592,7 +2580,6 @@ SpriteMorph.prototype.addCostume = function (costume) {
 };
 
 SpriteMorph.prototype.wearCostume = function (costume) {
-    if (costume == null) return; // Snap! YOW
     var x = this.xPosition ? this.xPosition() : null,
         y = this.yPosition ? this.yPosition() : null,
         isWarped = this.isWarped;
@@ -3363,32 +3350,21 @@ SpriteMorph.prototype.nestingBounds = function () {
     return result;
 };
 
-// SpriteMorph YOW map primitives
-
-SpriteMorph.prototype.moveTo = function (pos) {
-    this.geoposition = pos.contents;
-    this.updateMarker();
-};
-
-SpriteMorph.prototype.reportMyLocation = function () {
-    return new List([this.geoposition.lat, this.geoposition.lng]);
-};
+// SpriteMorph motion primitives
 
 SpriteMorph.prototype.forward = function (meters) {
-    // geoposition[0] is lat, geoposition[1] is lon
     // FIXME this is an approximation
     var kilometers = meters / 1000;
     var diffLat, diffLon;
     diffLat = Math.cos(radians(this.heading)) * (1 / 110.54 * kilometers);
     diffLon = Math.sin(radians(this.heading))
-        * (1 / (111.32 * Math.cos(radians(this.geoposition[0]))) * kilometers);
+        * (1 / (111.32 * Math.cos(radians(this.xPosition()))) * kilometers);
 
-    this.geoposition = [this.geoposition[0] + diffLat,
-            this.geoposition[1] + diffLon];
+    // TODO: "0 - ..." – why does this work? The formula above looks wrong ;-)
+    var diffPoint = new Point(diffLon, 0 - diffLat);
+    this.setPosition(this.position().add(diffPoint));
     this.updateMarker();
 };
-
-// SpriteMorph motion primitives
 
 Morph.prototype.setPosition = function (aPoint, justMe) {
     // override the inherited default to make sure my parts follow
@@ -3488,6 +3464,7 @@ SpriteMorph.prototype.gotoXY = function (x, y, justMe) {
     }
     this.setPosition(dest, justMe);
     this.positionTalkBubble();
+    this.updateMarker();
 };
 
 SpriteMorph.prototype.silentGotoXY = function (x, y, justMe) {
@@ -4909,7 +4886,7 @@ StageMorph.prototype.removeAllClones = function () {
 
 StageMorph.prototype.blockTemplates = function (category) {
     var blocks = [], myself = this, varNames, button,
-        cat = category || 'map', txt;
+        cat = category || 'motion', txt;
 
     function block(selector) {
         if (myself.hiddenPrimitives[selector]) {
@@ -4979,15 +4956,7 @@ StageMorph.prototype.blockTemplates = function (category) {
         }
     }
 
-    if (cat === 'map') {
-
-        blocks.push(block('reportUserLocation'));
-        blocks.push(block('focusMap'));
-        if (this.world().isDevMode) {
-            blocks.push(block('addMarker'));
-        }
-
-    } /* else if (cat === 'motion') {
+    if (cat === 'motion') {
 
         txt = new TextMorph(localize(
             'Stage selected:\nno motion primitives'
@@ -4996,7 +4965,7 @@ StageMorph.prototype.blockTemplates = function (category) {
         txt.setColor(this.paletteTextColor);
         blocks.push(txt);
 
-    } */ else if (cat === 'looks') {
+    } else if (cat === 'looks') {
 
         blocks.push(block('doSwitchToCostume'));
         blocks.push(block('doWearNextCostume'));
@@ -5143,7 +5112,6 @@ StageMorph.prototype.blockTemplates = function (category) {
         blocks.push(block('doSetFastTracking'));
         blocks.push('-');
         blocks.push(block('reportDate'));
-        blocks.push(block('reportUserLocation'));
 
     // for debugging: ///////////////
 

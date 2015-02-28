@@ -214,7 +214,7 @@ IDE_Morph.prototype.init = function (isAutoFill) {
 
     this.currentSprite = new SpriteMorph(this.globalVariables);
     this.sprites = new List([this.currentSprite]);
-    this.currentCategory = 'map';
+    this.currentCategory = 'motion';
     this.currentTab = 'scripts';
     this.projectName = '';
     this.projectNotes = '';
