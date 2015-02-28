@@ -1313,10 +1313,6 @@ SnapSerializer.prototype.openProject = function (project, ide) {
         sprites = [],
         sprite;
 
-    // recreate all Sprite markers (Snap-YOW)
-    window.map.removeLayer(window.spriteGroup);
-    window.spriteGroup = L.layerGroup().addTo(window.map);
-
     if (!project || !project.stage) {
         return;
     }
@@ -1335,6 +1331,16 @@ SnapSerializer.prototype.openProject = function (project, ide) {
     });
     sprites.sort(function (x, y) {
         return x.idx - y.idx;
+    });
+
+    // Snap! YOW
+    // recreate all Sprite markers (Snap-YOW)
+    window.map.removeLayer(window.spriteGroup);
+    window.spriteGroup = L.layerGroup().addTo(window.map);
+
+    sprites.forEach(function (sprite) {
+        // create the markers
+        sprite.updateMarker();
     });
 
     ide.sprites = new List(sprites);

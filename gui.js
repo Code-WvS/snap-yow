@@ -212,9 +212,6 @@ IDE_Morph.prototype.init = function (isAutoFill) {
 
     this.globalVariables = new VariableFrame();
 
-    // recreate all Sprite markers (Snap-YOW)
-    window.spriteGroup = L.layerGroup().addTo(window.map);
-
     this.currentSprite = new SpriteMorph(this.globalVariables);
     this.sprites = new List([this.currentSprite]);
     this.currentCategory = 'map';
@@ -2803,7 +2800,9 @@ IDE_Morph.prototype.newProject = function () {
     this.globalVariables = new VariableFrame();
 
     // recreate all Sprite markers (Snap-YOW)
-    window.map.removeLayer(window.spriteGroup);
+    if (window.map.hasLayer(window.spriteGroup)) {
+        window.map.removeLayer(window.spriteGroup);
+    }
     window.spriteGroup = L.layerGroup().addTo(window.map);
 
     this.currentSprite = new SpriteMorph(this.globalVariables);
