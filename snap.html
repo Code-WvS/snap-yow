@@ -27,6 +27,7 @@
         <div id="map" style="position: absolute; width: 480px; height: 360px;" />
         <!-- set initial size to 480x360 or the map will not load properly -->
         <script type="text/javascript">
+                // custom leaflet definitions
                 L.SpriteIcon = L.Icon.extend({
                     options: {
                         iconSize: [24, 24],
@@ -53,60 +54,48 @@
                     return new L.SpriteIcon(options);
                 };
 
+                // Snap! YOW starts here
                 var world, map, layer, spriteGroup, defaultCostume;
 
                 function loop() {
                     world.doOneCycle();
                 }
 
+                // Grabbing values via global variables from deep inside Snap! is easier
+                // Possible drawback: Multiple worlds could conflict
                 function setGlobalPosition (e) {
                     window.geoposition = e.latlng;
-                }
-
-                function startYOW () {
-                    new OSMBuildings(map).load();
-
-                    window.spriteGroup = spriteGroup;
-                    spriteGroup = L.layerGroup().addTo(map);
-
-                    world = new WorldMorph(document.getElementById('world'));
-                    world.worldCanvas.focus();
-                    new IDE_Morph().openIn(world);
-                    setInterval(loop, 10);
-                }
-
-                // TODO: this needs to be improved
-                function loadDefaultCostume (e) {
-                    setGlobalPosition(e);
-                    map.stopLocate();
-                    map.on('locationfound', setGlobalPosition);
-                    map.locate({watch: true, enableHighAccuracy: true});
-
-                    image = new Image();
-                    image.src = 'images/marker-icon.png';
-                    image.onload = function () {
-                        defaultCostume = document.createElement('canvas');
-                        defaultCostume.width = image.width;
-                        defaultCostume.height = image.height;
-                        var context = defaultCostume.getContext('2d');
-                        context.drawImage(image, 0, 0);
-                        window.defaultCostume = defaultCostume;
-                        startYOW(e);
-                    }
                 }
 
                 window.map = map;
                 window.layer = layer;
 
+                // initialize leaflet
                 map = L.map('map', {
                     keyboard: false
-                });
+                }).setView([52.5170365, 13.3888599], 10);
+                // The map steals the key events, so the 'world' canvas has to be focused
                 map.on('mouseover', function() {document.getElementById('world').focus();}); 
-                map.on('locationfound', loadDefaultCostume);
-                map.locate({setView: true});
+
                 layer = L.tileLayer('http://{s}.tile.osm.org/{z}/{x}/{y}.png', {
                             attribution: '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
                 }).addTo(map);
+
+                // continuously update the local location variable
+                map.on('locationfound', setGlobalPosition);
+                map.locate({watch: true, enableHighAccuracy: true});
+
+                // OSMBuildings provides fancy 3D buildings
+                new OSMBuildings(map).load();
+
+                window.spriteGroup = spriteGroup;
+                spriteGroup = L.layerGroup().addTo(map);
+
+                // Load the IDE
+                world = new WorldMorph(document.getElementById('world'));
+                world.worldCanvas.focus();
+                new IDE_Morph().openIn(world);
+                setInterval(loop, 10);
         </script>
     </body>
 </html>
