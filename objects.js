@@ -219,6 +219,12 @@ SpriteMorph.prototype.initBlocks = function () {
             spec: 'lat, lon of %s',
             defaults: ['Tiergarten Berlin']
         },
+        // TODO: move these to a 'map' category or so
+        reportGeocode: {
+            type: 'reporter',
+            category: 'motion',
+            spec: 'address at lon: %n lat: %n'
+        },
         focusMap: {
             type: 'command',
             category: 'motion',
@@ -1772,6 +1778,7 @@ SpriteMorph.prototype.blockTemplates = function (category) {
     if (cat === 'motion') {
         blocks.push(block('userLon'));
         blocks.push(block('userLat'));
+        blocks.push(block('reportGeocode'));
         blocks.push(block('findLocation'));
         blocks.push(block('focusMap'));
 

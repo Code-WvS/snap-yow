@@ -2642,6 +2642,32 @@ Process.prototype.addMarker = function (pos) {
     L.marker(pos.contents).addTo(window.map);
 };
 
+Process.prototype.reportGeocode = function (lon, lat) {
+    var myself = this;
+
+    if (!myself.context.jsonpScript) {
+        window.OSM_JSONP_Callback = function (data) {
+            myself.context.json = data;
+            window.OSM_JSONP_Callback = undefined;
+        };
+        myself.context.jsonpScript = document.createElement('script');
+        myself.context.jsonpScript.src =
+            'https://nominatim.openstreetmap.org/reverse'
+            + '?format=json&json_callback=OSM_JSONP_Callback'
+            + '&addressdetails=0&limit=1&zoom=18'
+            + '&lon=' + lon + '&lat=' + lat;
+        document.getElementsByTagName('HEAD')[0]
+            .appendChild(myself.context.jsonpScript);
+    } else {
+        if (myself.context.json) {
+            return myself.context.json.display_name;
+        }
+    }
+
+    this.pushContext('doYield');
+    this.pushContext();
+}
+
 Process.prototype.findLocation = function (searchString) {
     var myself = this;
 
@@ -2655,7 +2681,7 @@ Process.prototype.findLocation = function (searchString) {
             'https://nominatim.openstreetmap.org/search'
             + '?format=json&json_callback=OSM_JSONP_Callback'
             + '&addressdetails=0&limit=1'
-            + '&q=' + myself.inputOption(searchString);
+            + '&q=' + searchString;
         document.getElementsByTagName('HEAD')[0]
             .appendChild(myself.context.jsonpScript);
     } else {
