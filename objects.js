@@ -3358,7 +3358,7 @@ SpriteMorph.prototype.forward = function (meters) {
     var diffLat, diffLon;
     diffLat = Math.cos(radians(this.heading)) * (1 / 110.54 * kilometers);
     diffLon = Math.sin(radians(this.heading))
-        * (1 / (111.32 * Math.cos(radians(this.xPosition()))) * kilometers);
+        * (1 / (111.32 * Math.cos(radians(this.yPosition()))) * kilometers);
 
     // TODO: "0 - ..." – why does this work? The formula above looks wrong ;-)
     var diffPoint = new Point(diffLon, 0 - diffLat);
