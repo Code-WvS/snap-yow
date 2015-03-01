@@ -2642,6 +2642,30 @@ Process.prototype.addMarker = function (pos) {
     L.marker(pos.contents).addTo(window.map);
 };
 
+// Nesting reporters that 'doYield' sucks; as a workaround,
+// there is a library imported that uses this function.
+// TODO: Improve this :)
+//
+// returns true if there are elements returned by the overpass query
+Process.prototype.overpassQuerySucceeds = function (query) {
+    var url = 'overpass-api.de/api/interpreter?data=[out:json];'
+        + query;
+
+    var response;
+    if (!this.httpRequest) {
+        this.httpRequest = new XMLHttpRequest();
+        this.httpRequest.open("GET", 'http://' + url, true);
+        this.httpRequest.send(null);
+    } else if (this.httpRequest.readyState === 4) {
+        response = this.httpRequest.responseText;
+        this.httpRequest = null;
+        console.log(response); // DEBUG
+        return JSON.parse(response).elements.length > 0;
+    }
+    this.pushContext('doYield');
+    this.pushContext();
+};
+
 Process.prototype.reportGeocode = function (lon, lat) {
     var myself = this;
 
@@ -2666,7 +2690,7 @@ Process.prototype.reportGeocode = function (lon, lat) {
 
     this.pushContext('doYield');
     this.pushContext();
-}
+};
 
 Process.prototype.findLocation = function (searchString) {
     var myself = this;
@@ -2693,7 +2717,7 @@ Process.prototype.findLocation = function (searchString) {
 
     this.pushContext('doYield');
     this.pushContext();
-}
+};
 
 // Process Dates and times in Snap
 // Map block options to built-in functions
