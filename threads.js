@@ -2638,10 +2638,6 @@ Process.prototype.focusMap = function (lon, lat, zoom) {
     window.map.setView([lat, lon], zoom);
 };
 
-Process.prototype.addMarker = function (pos) {
-    L.marker(pos.contents).addTo(window.map);
-};
-
 // Nesting reporters that 'doYield' sucks; as a workaround,
 // there is a library imported that uses this function.
 // TODO: Improve this :)

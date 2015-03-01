@@ -226,7 +226,7 @@ SpriteMorph.prototype.initBlocks = function () {
         },
         overpassQuerySucceeds: {
             type: 'predicate',
-            category: 'motion',
+            category: 'sensing',
             spec: 'overpass query %s returns elements'
         },
         focusMap: {
@@ -234,12 +234,6 @@ SpriteMorph.prototype.initBlocks = function () {
             category: 'motion',
             spec: 'set focus to longitude: %n latitude: %n with zoom %n',
             defaults: [0, 0, 12]
-        },
-        addMarker: {
-            dev: true,
-            type: 'command',
-            category: 'motion',
-            spec: 'debug: add a marker to %l'
         },
 
         // Motion
@@ -1801,17 +1795,11 @@ SpriteMorph.prototype.blockTemplates = function (category) {
         blocks.push(block('userLon'));
         blocks.push(block('userLat'));
         blocks.push('-');
-        blocks.push(block('overpassQuerySucceeds'));
-        blocks.push('-');
         blocks.push(block('reportGeocode'));
         blocks.push(block('findLocation'));
         blocks.push('-');
         blocks.push(block('focusMap'));
         blocks.push('-');
-
-        //if (this.world().isDevMode) {
-            blocks.push(block('addMarker'));
-        //}
 
         blocks.push('=');
 
@@ -2021,6 +2009,8 @@ SpriteMorph.prototype.blockTemplates = function (category) {
         blocks.push(block('doSetFastTracking'));
         blocks.push('-');
         blocks.push(block('reportDate'));
+        blocks.push('-');
+        blocks.push(block('overpassQuerySucceeds'));
 
     // for debugging: ///////////////
 
