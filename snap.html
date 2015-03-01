@@ -105,8 +105,10 @@
                 world.worldCanvas.focus();
                 ide = new IDE_Morph();
                 ide.openIn(world);
-                // load custom blocks that simplify the use of overpass
-                ide.droppedText(ide.getURL('overpass.xml'));
+
+                setTimeout(function () { // FIXME dirty hack
+                    ide.droppedText(ide.getURL('overpass.xml'));
+                }, 2000);
                 setInterval(loop, 10);
         </script>
     </body>

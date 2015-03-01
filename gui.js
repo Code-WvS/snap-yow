@@ -2831,6 +2831,7 @@ IDE_Morph.prototype.newProject = function () {
     this.createCorral();
     this.selectSprite(this.stage.children[0]);
     this.fixLayout();
+    this.droppedText(this.getURL('overpass.xml')); // YOW hack (TODO)
 };
 
 IDE_Morph.prototype.save = function () {
