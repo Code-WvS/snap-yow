@@ -103,7 +103,10 @@
                 // Load the IDE
                 world = new WorldMorph(document.getElementById('world'));
                 world.worldCanvas.focus();
-                new IDE_Morph().openIn(world);
+                ide = new IDE_Morph();
+                ide.openIn(world);
+                // load custom blocks that simplify the use of overpass
+                ide.droppedText(ide.getURL('overpass.xml'));
                 setInterval(loop, 10);
         </script>
     </body>
