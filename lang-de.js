@@ -290,8 +290,18 @@ SnapTranslator.dict.de = {
         'B\u00fchne ausgew\u00e4hlt:\nkeine Standardbewegungsbl\u00f6cke\n'
             + 'vorhanden',
 
-    'move %n steps':
-        'gehe %n Schritte',
+    'user lon':
+        'Benutzer lon',
+    'user lat':
+        'Benutzer lat',
+    'address at lon: %n lat: %n':
+        'Adresse lon: %n lat: %n',
+    'lat, lon of %s':
+        'lat,lon von %s',
+    'set focus to lon: %n lat: %n with zoom %n':
+        'setze den Fokus auf lon: %n lat: %n mit dem Zoom %n',
+    'move %n meters':
+        'gehe %n Meter',
     'turn %clockwise %n degrees':
         'drehe %clockwise %n Grad',
     'turn %counterclockwise %n degrees':
@@ -300,26 +310,26 @@ SnapTranslator.dict.de = {
         'zeige Richtung %dir',
     'point towards %dst':
         'zeige auf %dst',
-    'go to x: %n y: %n':
-        'gehe zu x: %n y: %n',
+    'go to lon: %n lat: %n':
+        'gehe zu lon: %n lat: %n',
     'go to %dst':
         'gehe zu %dst',
-    'glide %n secs to x: %n y: %n':
-        'gleite %n Sek. zu x: %n y: %n',
-    'change x by %n':
-        '\u00e4ndere x um %n',
-    'set x to %n':
-        'setze x auf %n',
-    'change y by %n':
-        '\u00e4ndere y um %n',
-    'set y to %n':
-        'setze y auf %n',
+    'glide %n secs to lon: %n lat: %n':
+        'gleite %n Sek. zu lon: %n lat: %n',
+    'change lon by %n':
+        '\u00e4ndere lon um %n',
+    'set lon to %n':
+        'setze lon auf %n',
+    'change lat by %n':
+        '\u00e4ndere lat um %n',
+    'set lat to %n':
+        'setze lat auf %n',
     'if on edge, bounce':
         'pralle vom Rand ab',
-    'x position':
-        'x-Position',
-    'y position':
-        'y-Position',
+    'longitude':
+        'L\u00e4ngengrad',
+    'latitude':
+        'Breitengrad',
     'direction':
         'Richtung',
 
