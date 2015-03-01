@@ -290,16 +290,16 @@ SnapTranslator.dict.de = {
         'B\u00fchne ausgew\u00e4hlt:\nkeine Standardbewegungsbl\u00f6cke\n'
             + 'vorhanden',
 
-    'user lon':
-        'Benutzer lon',
-    'user lat':
-        'Benutzer lat',
-    'address at lon: %n lat: %n':
-        'Adresse lon: %n lat: %n',
-    'lat, lon of %s':
-        'lat,lon von %s',
-    'set focus to lon: %n lat: %n with zoom %n':
-        'setze den Fokus auf lon: %n lat: %n mit dem Zoom %n',
+    'user\'s longitude':
+        'Benutzers L\u00e4ngengrad',
+    'user\'s latitude':
+        'Benutzers Breitengrad',
+    'address at longitude: %n latitude: %n':
+        'Adresse L\u00e4ngengrad: %n Breitengrad: %n',
+    'latitude, longitude of %s':
+        'Breitengrad, L\u00e4ngengrad von %s',
+    'set focus to longitude: %n latitude: %n with zoom %n':
+        'setze den Fokus auf L\u00e4ngengrad: %n Breitengrad: %n mit dem Zoom %n',
     'move %n meters':
         'gehe %n Meter',
     'turn %clockwise %n degrees':
@@ -310,20 +310,20 @@ SnapTranslator.dict.de = {
         'zeige Richtung %dir',
     'point towards %dst':
         'zeige auf %dst',
-    'go to lon: %n lat: %n':
-        'gehe zu lon: %n lat: %n',
+    'go to longitude: %n latitude: %n':
+        'gehe zu L\u00e4ngengrad: %n Breitengrad: %n',
     'go to %dst':
         'gehe zu %dst',
-    'glide %n secs to lon: %n lat: %n':
-        'gleite %n Sek. zu lon: %n lat: %n',
-    'change lon by %n':
-        '\u00e4ndere lon um %n',
-    'set lon to %n':
-        'setze lon auf %n',
-    'change lat by %n':
-        '\u00e4ndere lat um %n',
-    'set lat to %n':
-        'setze lat auf %n',
+    'glide %n secs to longitude: %n latitude: %n':
+        'gleite %n Sek. zu L\u00e4ngengrad: %n Breitengrad: %n',
+    'change longitude by %n':
+        '\u00e4ndere L\u00e4ngengrad um %n',
+    'set longitude to %n':
+        'setze L\u00e4ngengrad auf %n',
+    'change latitude by %n':
+        '\u00e4ndere Breitengrad um %n',
+    'set latitude to %n':
+        'setze Breitengrad auf %n',
     'if on edge, bounce':
         'pralle vom Rand ab',
     'longitude':

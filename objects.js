@@ -206,23 +206,23 @@ SpriteMorph.prototype.initBlocks = function () {
         userLon: {
             type: 'reporter',
             category: 'motion',
-            spec: 'user lon'
+            spec: 'user\'s longitude'
         },
         userLat: {
             type: 'reporter',
             category: 'motion',
-            spec: 'user lat'
+            spec: 'user\'s latitude'
         },
         findLocation: {
             type: 'reporter',
             category: 'motion',
-            spec: 'lat, lon of %s',
+            spec: 'latitude, longitude of %s',
             defaults: ['Tiergarten Berlin']
         },
         reportGeocode: {
             type: 'reporter',
             category: 'motion',
-            spec: 'address at lon: %n lat: %n'
+            spec: 'address at longitude: %n latitude: %n'
         },
         overpassQuerySucceeds: {
             type: 'predicate',
@@ -232,7 +232,7 @@ SpriteMorph.prototype.initBlocks = function () {
         focusMap: {
             type: 'command',
             category: 'motion',
-            spec: 'set focus to lon: %n lat: %n with zoom %n',
+            spec: 'set focus to longitude: %n latitude: %n with zoom %n',
             defaults: [0, 0, 12]
         },
         addMarker: {
@@ -286,7 +286,7 @@ SpriteMorph.prototype.initBlocks = function () {
             only: SpriteMorph,
             type: 'command',
             category: 'motion',
-            spec: 'go to lon: %n lat: %n',
+            spec: 'go to longitude: %n latitude: %n',
             defaults: [0, 0]
         },
         doGotoObject: {
@@ -299,35 +299,35 @@ SpriteMorph.prototype.initBlocks = function () {
             only: SpriteMorph,
             type: 'command',
             category: 'motion',
-            spec: 'glide %n secs to lon: %n lat: %n',
+            spec: 'glide %n secs to longitude: %n latitude: %n',
             defaults: [1, 0, 0]
         },
         changeXPosition: {
             only: SpriteMorph,
             type: 'command',
             category: 'motion',
-            spec: 'change lon by %n',
+            spec: 'change longitude by %n',
             defaults: [10]
         },
         setXPosition: {
             only: SpriteMorph,
             type: 'command',
             category: 'motion',
-            spec: 'set lon to %n',
+            spec: 'set longitude to %n',
             defaults: [0]
         },
         changeYPosition: {
             only: SpriteMorph,
             type: 'command',
             category: 'motion',
-            spec: 'change lat by %n',
+            spec: 'change latitude by %n',
             defaults: [10]
         },
         setYPosition: {
             only: SpriteMorph,
             type: 'command',
             category: 'motion',
-            spec: 'set lat to %n',
+            spec: 'set latitude to %n',
             defaults: [0]
         },
         bounceOffEdge: {
