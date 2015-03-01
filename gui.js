@@ -244,6 +244,22 @@ IDE_Morph.prototype.init = function (isAutoFill) {
     // initialize inherited properties:
     IDE_Morph.uber.init.call(this);
 
+    // Snap! YOW
+    // set initial sprite position after the map has loaded
+    // The map center is set at the same time as 'geoposition'
+    // when a position has been acquired.
+    var myself = this;
+    if (!window.geoposition) {
+        window.map.on('load', function () {
+            myself.currentSprite.gotoXY(window.map.getCenter().lng,
+                    window.map.getCenter().lat);
+        });
+    } else {
+        // in case init() is called after the map loaded
+        this.currentSprite.gotoXY(window.map.getCenter().lng,
+                window.map.getCenter().lat);
+    }
+
     // override inherited properites:
     this.color = this.backgroundColor;
 };
@@ -1861,8 +1877,7 @@ IDE_Morph.prototype.addNewSprite = function () {
     sprite.setHue(rnd.call(this, 0, 100));
     sprite.setBrightness(rnd.call(this, 50, 100));
     sprite.turn(rnd.call(this, 1, 360));
-    sprite.setXPosition(rnd.call(this, -220, 220));
-    sprite.setYPosition(rnd.call(this, -160, 160));
+    sprite.gotoXY(window.map.getCenter().lng, window.map.getCenter().lat);
 
     this.sprites.add(sprite);
     this.corral.addSprite(sprite);

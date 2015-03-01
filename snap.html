@@ -69,6 +69,14 @@
                     window.geoposition = e.latlng;
                 }
 
+                // Sets the view on the first locate
+                function firstLocate (e) {
+                    setGlobalPosition(e);
+                    map.stopLocate();
+                    map.on('locationfound', setGlobalPosition);
+                    map.locate({watch: true, enableHighAccuracy: true});
+                }
+
                 window.map = map;
                 window.layer = layer;
 
@@ -76,7 +84,7 @@
                 map = L.map('map', {
                     keyboard: false,
                     closePopupOnClick: false
-                }).setView([52.5170365, 13.3888599], 10);
+                });
                 // The map steals the key events, so the 'world' canvas has to be focused
                 map.on('mouseover', function() {document.getElementById('world').focus();}); 
 
@@ -91,8 +99,8 @@
                 }).addTo(map);
 
                 // continuously update the local location variable
-                map.on('locationfound', setGlobalPosition);
-                map.locate({watch: true, enableHighAccuracy: true});
+                map.on('locationfound', firstLocate);
+                map.locate({setView: true, enableHighAccuracy: true});
 
                 // OSMBuildings provides fancy 3D buildings
                 new OSMBuildings(map).load();
