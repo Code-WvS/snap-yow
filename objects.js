@@ -3317,18 +3317,21 @@ SpriteMorph.prototype.drawLine = function (start, dest) {
         if (!window.polylines[this.myPolylineIndex]) {
             // add a new line with start and end points
             window.polylines[this.myPolylineIndex] = L.polyline([
-                [stage.dimensions.y / 2 - from.y,
-                    from.x - stage.dimensions.x / 2], destLatLng,
-            ], 
+                        [stage.dimensions.y / 2 - from.y,
+                            from.x - stage.dimensions.x / 2],
+                        destLatLng,
+                    ], 
                     {color: this.color.toString(), weight: this.size})
                         .addTo(window.penTrails);
         } else {
             var latlngs = window.polylines[this.myPolylineIndex].getLatLngs();
             for (var j = 0; j < latlngs.length; j++) {
                 if (latlngs[j].distanceTo(destLatLng) < 0.1) {
-                    var polyLL = window.polylines[this.myPolylineIndex].spliceLatLngs(j, latlngs.length)
+                    var polyLL = window.polylines[this.myPolylineIndex]
+                        .spliceLatLngs(j, latlngs.length)
                         .concat([destLatLng]);
-                    L.polygon(polyLL, {color: this.color.toString(), weight: this.size})
+                    L.polygon(polyLL, 
+                            {color: this.color.toString(), weight: this.size})
                         .addTo(window.penTrails);
                     break;
                 }

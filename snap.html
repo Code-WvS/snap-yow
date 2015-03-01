@@ -112,6 +112,11 @@
                 // OSMBuildings provides fancy 3D buildings
                 new OSMBuildings(map).load();
 
+                // A Sprite's X position is mapped to longitude
+                // A Sprite's Y position is mapped to latitude
+                // The stage has -x left and +x right,
+                // -y top and +y bottom but we want
+                // +y top and -y bottom.
                 window.spriteGroup = spriteGroup;
                 spriteGroup = L.layerGroup().addTo(map);
 
