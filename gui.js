@@ -2830,6 +2830,10 @@ IDE_Morph.prototype.newProject = function () {
         window.map.removeLayer(window.spriteGroup);
     }
     window.spriteGroup = L.layerGroup().addTo(window.map);
+    if (window.map.hasLayer(window.penTrails)) {
+        window.map.removeLayer(window.penTrails);
+    }
+    window.penTrails = L.layerGroup().addTo(window.map);
 
     this.currentSprite = new SpriteMorph(this.globalVariables);
     this.sprites = new List([this.currentSprite]);

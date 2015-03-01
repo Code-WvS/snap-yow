@@ -57,7 +57,7 @@
                 };
 
                 // Snap! YOW starts here
-                var world, map, layer, spriteGroup;
+                var world, map, layer, spriteGroup, polylines, polylineIndex;
 
                 function loop() {
                     world.doOneCycle();
@@ -114,6 +114,15 @@
 
                 window.spriteGroup = spriteGroup;
                 spriteGroup = L.layerGroup().addTo(map);
+
+                // During a pen down, a polyline is updated at polylines[this.myPolylineIndex].
+                // On pen up, myPolylineIndex is set to polylineIndex and polylineIndex is incremented
+                // so polylines contains complete lines created by different sprites.
+                // These lines might be (partially) transformed into polygons.
+                window.penTrails = L.layerGroup().addTo(map);
+                window.polylines = polylines;
+                polylineIndex = 0;
+                polylines = [];
 
                 // Load the IDE
                 world = new WorldMorph(document.getElementById('world'));

@@ -1342,6 +1342,10 @@ SnapSerializer.prototype.openProject = function (project, ide) {
     // recreate all Sprite markers (Snap-YOW)
     window.map.removeLayer(window.spriteGroup);
     window.spriteGroup = L.layerGroup().addTo(window.map);
+    // create new pen trails
+    // TODO: "pen trails" are not saved
+    window.map.removeLayer(window.penTrails);
+    window.penTrails = L.layerGroup().addTo(window.map);
 
     sprites.forEach(function (sprite) {
         // create the markers

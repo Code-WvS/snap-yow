@@ -1393,6 +1393,8 @@ SpriteMorph.prototype.init = function (globals) {
     this.isDraggable = true;
     this.isDown = false;
 
+    this.myPolylineIndex = window.polylineIndex++;
+
     this.heading = 90;
     this.changed();
     this.drawNew();
@@ -3308,6 +3310,33 @@ SpriteMorph.prototype.drawLine = function (start, dest) {
         ).intersect(this.parent.visibleBounds()).spread();
 
     if (this.isDown) {
+        var stage = this.parent;
+        var destLatLng = 
+            [stage.dimensions.y / 2 - to.y, to.x - stage.dimensions.x / 2];
+
+        if (!window.polylines[this.myPolylineIndex]) {
+            // add a new line with start and end points
+            window.polylines[this.myPolylineIndex] = L.polyline([
+                [stage.dimensions.y / 2 - from.y,
+                    from.x - stage.dimensions.x / 2], destLatLng,
+            ], 
+                    {color: this.color.toString(), weight: this.size})
+                        .addTo(window.penTrails);
+        } else {
+            var latlngs = window.polylines[this.myPolylineIndex].getLatLngs();
+            for (var j = 0; j < latlngs.length; j++) {
+                if (latlngs[j].distanceTo(destLatLng) < 0.1) {
+                    var polyLL = window.polylines[this.myPolylineIndex].spliceLatLngs(j, latlngs.length)
+                        .concat([destLatLng]);
+                    L.polygon(polyLL, {color: this.color.toString(), weight: this.size})
+                        .addTo(window.penTrails);
+                    break;
+                }
+            }
+
+            window.polylines[this.myPolylineIndex].addLatLng(destLatLng);
+        }
+
         context.lineWidth = this.size;
         context.strokeStyle = this.color.toString();
         if (this.useFlatLineEnds) {
@@ -3342,6 +3371,9 @@ SpriteMorph.prototype.moveBy = function (delta, justMe) {
         this.parts.forEach(function (part) {
             part.moveBy(delta);
         });
+    }
+    if (!this.isDown) {
+        this.myPolylineIndex = window.polylineIndex++;
     }
 };
 
@@ -3403,7 +3435,6 @@ SpriteMorph.prototype.forward = function (meters) {
     diffLon = Math.sin(radians(this.heading))
         * (1 / (111.32 * Math.cos(radians(this.yPosition()))) * kilometers);
 
-    // TODO: "0 - ..." – why does this work? The formula above looks wrong ;-)
     var diffPoint = new Point(diffLon, 0 - diffLat);
     this.setPosition(this.position().add(diffPoint));
     this.updateMarker();
@@ -4563,6 +4594,8 @@ StageMorph.prototype.drawOn = function (aCanvas, aRect) {
 };
 
 StageMorph.prototype.clearPenTrails = function () {
+    window.map.removeLayer(window.penTrails);
+    window.penTrails = L.layerGroup().addTo(window.map);
     this.trailsCanvas = newCanvas(this.dimensions);
     this.changed();
 };
