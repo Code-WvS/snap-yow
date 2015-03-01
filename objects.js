@@ -306,7 +306,7 @@ SpriteMorph.prototype.initBlocks = function () {
             only: SpriteMorph,
             type: 'command',
             category: 'motion',
-            spec: 'change lat by %n',
+            spec: 'change lon by %n',
             defaults: [10]
         },
         setXPosition: {
