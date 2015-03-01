@@ -1419,7 +1419,7 @@ SpriteMorph.prototype.updateMarker = function () {
     });
     // X position is longitude, Y latitude
     this.marker = L.marker([this.yPosition(), this.xPosition()],
-            {icon: this.icon, title: this.name});
+            {icon: this.icon, title: this.name, draggable: this.draggable});
 
     // add event handlers
     this.marker.on('click', function () {
