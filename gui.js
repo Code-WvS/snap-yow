@@ -241,9 +241,6 @@ IDE_Morph.prototype.init = function (isAutoFill) {
     this.loadNewProject = false; // flag when starting up translated
     this.shield = null;
 
-    // initialize inherited properties:
-    IDE_Morph.uber.init.call(this);
-
     // Snap! YOW
     // set initial sprite position after the map has loaded
     // The map center is set at the same time as 'geoposition'
@@ -259,6 +256,9 @@ IDE_Morph.prototype.init = function (isAutoFill) {
         this.currentSprite.gotoXY(window.map.getCenter().lng,
                 window.map.getCenter().lat);
     }
+
+    // initialize inherited properties:
+    IDE_Morph.uber.init.call(this);
 
     // override inherited properites:
     this.color = this.backgroundColor;

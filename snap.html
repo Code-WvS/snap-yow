@@ -71,8 +71,9 @@
 
                 // Sets the view on the first locate
                 function firstLocate (e) {
-                    setGlobalPosition(e);
                     map.stopLocate();
+                    map.setView(e.latlng, 18);
+                    setGlobalPosition(e);
                     map.on('locationfound', setGlobalPosition);
                     map.locate({watch: true, enableHighAccuracy: true});
                 }
@@ -87,6 +88,12 @@
                 });
                 // The map steals the key events, so the 'world' canvas has to be focused
                 map.on('mouseover', function() {document.getElementById('world').focus();}); 
+                // Resizing hides the markers
+                map.on('resize', function() {
+                    ide.sprites.asArray().forEach(function (sprite) {
+                        sprite.updateMarker();
+                    });
+                });
 
                 layer = L.tileLayer('http://{s}.tile.osm.org/{z}/{x}/{y}.png', {
                             attribution: '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
@@ -100,7 +107,7 @@
 
                 // continuously update the local location variable
                 map.on('locationfound', firstLocate);
-                map.locate({setView: true, enableHighAccuracy: true});
+                map.locate({enableHighAccuracy: true});
 
                 // OSMBuildings provides fancy 3D buildings
                 new OSMBuildings(map).load();
