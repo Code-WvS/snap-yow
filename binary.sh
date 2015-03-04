@@ -63,8 +63,8 @@ then
     # load custom project from url
     sed -i "/ide\.openIn/a\
         ide.droppedText(ide.getURL('$url'));" snap.html
-    # ... in presentation mode
-    sed -i "s/this.isAppMode = false/this.isAppMode = true/g" gui.js
+    sed -i "/this.toggleAppMode(false)/d" gui.js
+    sed -i "s/snap.html/snap.html#run:/g" config.xml package.json
 fi
 
 # compress all js files
