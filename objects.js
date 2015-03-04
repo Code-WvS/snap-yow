@@ -4579,10 +4579,19 @@ StageMorph.prototype.drawNew = function () {
 
 StageMorph.prototype.drawOn = function (aCanvas, aRect) {
     var map = document.getElementById('map');
-    map.style.width = this.dimensions.x * this.scale + 'px';
-    map.style.height = this.dimensions.y * this.scale + 'px';
-    map.style.left = this.left() + 'px';
-    map.style.top = this.top() + 'px';
+    ide = this.parentThatIsA(IDE_Morph);
+
+    if (!ide.isAppMode) {
+        map.style.left = this.left() + 'px';
+        map.style.top = this.top() + 'px';
+        map.style.width = this.dimensions.x * this.scale + 'px';
+        map.style.height = this.dimensions.y * this.scale + 'px';
+    } else {
+        map.style.left = ide.left() + 'px';
+        map.style.top = this.top() + 'px';
+        map.style.width = ide.extent().x + 'px';
+        map.style.height = (ide.extent().y - this.top()) + 'px';
+    }
     window.map.invalidateSize();
 };
 
