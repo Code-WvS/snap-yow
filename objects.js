@@ -1176,6 +1176,19 @@ SpriteMorph.prototype.initBlocks = function () {
             defaults: [localize('each item')]
         },
 
+        // peer to peer communication
+        receivePeerMessage: {
+            type: 'hat',
+            category: 'other',
+            spec: 'when I receive %upvar from %upvar',
+            defaults: [localize('message'), localize('peer')]
+        },
+        sendPeerMessage: {
+            type: 'command',
+            category: 'other',
+            spec: 'send %s to %s'
+        },
+
         // Code mapping - experimental
         doMapCodeOrHeader: { // experimental
             type: 'command',
@@ -2100,6 +2113,11 @@ SpriteMorph.prototype.blockTemplates = function (category) {
         }
 
     /////////////////////////////////
+
+        blocks.push('=');
+
+        blocks.push(block('receivePeerMessage'));
+        blocks.push(block('sendPeerMessage'));
 
         blocks.push('=');
 
@@ -3517,6 +3535,9 @@ SpriteMorph.prototype.allHatBlocksFor = function (message) {
             if (morph.selector === 'receiveOnClone') {
                 return message === '__clone__init__';
             }
+            if (morph.selector === 'receivePeerMessage') {
+                return message === '__peer__message__';
+            }
         }
         return false;
     });
@@ -4386,7 +4407,61 @@ StageMorph.prototype.init = function (globals) {
     this.acceptsDrops = false;
     this.setColor(new Color(255, 255, 255));
     this.fps = this.frameRate;
+
+    this.peer = new Peer({
+        host: 'snapmesh.herokuapp.com',
+        port: 80,
+        path: '/'
+    });
+    var myself = this;
+
+    this.peer.on('open', function (id) {
+        myself.peerId = id;
+        console.log('Id: ' + id); // DEBUG
+    });
+
+    this.peer.on('connection', function (connection) {
+        connection.on('open', function () {
+            connection.on('data', function (data) {
+                var hats = [];
+                // call hat blocks
+                myself.children.concat(myself).forEach(function (morph) {
+                    if (morph instanceof SpriteMorph
+                            || morph instanceof StageMorph) {
+                        hats = hats.concat(
+                                morph.allHatBlocksFor('__peer__message__'));
+                    }
+                });
+                hats.forEach(function (block) {
+                    var process = myself.threads.startProcess(block,
+                            myself.isThreadSafe);
+                    process.context.outerContext.variables.addVar('message');
+                    process.context.outerContext.variables.setVar(
+                        'message',
+                        data 
+                    );
+                    process.context.outerContext.variables.addVar('peer');
+                    process.context.outerContext.variables.setVar(
+                        'peer',
+                        connection.peer
+                    );
+                });
+            });
+        });
+    });
 };
+
+// peer to peer communication
+
+SpriteMorph.prototype.sendPeerMessage = function (message, peer) {
+    var stage = this.parentThatIsA(StageMorph);
+    var connection = stage.peer.connect(peer, {reliable: true});
+    connection.on('open', function () {
+        connection.send(message);
+    });
+};
+
+StageMorph.prototype.sendPeerMessage = SpriteMorph.prototype.sendPeerMessage;
 
 // StageMorph scaling
 
@@ -5303,6 +5378,10 @@ StageMorph.prototype.blockTemplates = function (category) {
 
     /////////////////////////////////
 
+        blocks.push('=');
+
+        blocks.push(block('receivePeerMessage'));
+        blocks.push(block('sendPeerMessage'));
         blocks.push('=');
 
         if (StageMorph.prototype.enableCodeMapping) {
