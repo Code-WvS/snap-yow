@@ -4423,7 +4423,17 @@ StageMorph.prototype.init = function (globals) {
     this.peer.on('connection', function (connection) {
         connection.on('open', function () {
             connection.on('data', function (data) {
-                var hats = [];
+                var ide = myself.parentThatIsA(IDE_Morph);
+                var hats = [], model, message;
+                try {
+                    model = ide.serializer.parse(data);
+                    message = ide.serializer.loadValue(model);
+                } catch (err) {
+                    console.log(err); // DEBUG
+                    // Ok, it does not seem to be XML. It must be a string then.
+                    message = data;
+                }
+
                 // call hat blocks
                 myself.children.concat(myself).forEach(function (morph) {
                     if (morph instanceof SpriteMorph
@@ -4438,7 +4448,7 @@ StageMorph.prototype.init = function (globals) {
                     process.context.outerContext.variables.addVar('message');
                     process.context.outerContext.variables.setVar(
                         'message',
-                        data 
+                        message
                     );
                     process.context.outerContext.variables.addVar('peer');
                     process.context.outerContext.variables.setVar(
@@ -4454,10 +4464,19 @@ StageMorph.prototype.init = function (globals) {
 // peer to peer communication
 
 SpriteMorph.prototype.sendPeerMessage = function (message, peer) {
-    var stage = this.parentThatIsA(StageMorph);
+    var stage = this.parentThatIsA(StageMorph),
+        ide = this.parentThatIsA(IDE_Morph);
     var connection = stage.peer.connect(peer, {reliable: true});
     connection.on('open', function () {
-        connection.send(message);
+        var data;
+        if (typeof message == "string") {
+            data = message;
+        } else if (typeof message == "function") {
+            data = message.toString();
+        } else {
+            data = ide.serializer.serialize(message);
+        }
+        connection.send(data);
     });
 };
 
