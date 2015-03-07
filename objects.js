@@ -4428,6 +4428,12 @@ StageMorph.prototype.init = function (globals) {
                 try {
                     model = ide.serializer.parse(data);
                     message = ide.serializer.loadValue(model);
+
+                    // TODO: If a Context is sent, a new Sprite appears.
+                    // This below is just a workaround for one-level rings,
+                    // objects should be cleaned recursively.
+                    message.receiver = null;
+                    message.outerContext = null;
                 } catch (err) {
                     console.log(err); // DEBUG
                     // Ok, it does not seem to be XML. It must be a string then.
