@@ -4561,11 +4561,9 @@ StageMorph.prototype.initPeering = function (id) {
 
     if (window.peers) {
         // I don't know why, but it works.
-        window.peers.forEach(function (oldpeer) {
-            if (id != oldpeer.id) {
-                oldpeer.destroy()
-            }
-        });
+        while (window.peers.length > 0) {
+            window.peers.pop().destroy();
+        }
     }
 
     this.peer = new Peer(id, {
