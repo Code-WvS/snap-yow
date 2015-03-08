@@ -1295,6 +1295,47 @@ Process.prototype.doRemoveTemporaries = function () {
     }
 };
 
+// Peer to peer primitives
+
+Process.prototype.sendPeerMessage = function (message, peer) {
+    var stage = this.homeContext.receiver.parentThatIsA(StageMorph),
+        ide = this.homeContext.receiver.parentThatIsA(IDE_Morph);
+    var connection = stage.peer.connect(peer, {reliable: true});
+    connection.on('open', function () {
+        var data;
+        if (typeof message == "string") {
+            data = message;
+        } else if (typeof message == "function") {
+            data = message.toString();
+        } else {
+            data = ide.serializer.serialize(message);
+        }
+        connection.send(data);
+    });
+};
+
+Process.prototype.reportPeerList = function () {
+    var myself = this;
+
+    if (!this.context.wait) {
+        var stage = this.homeContext.receiver.parentThatIsA(StageMorph);
+        stage.peer.listAllPeers(function (peers) {
+            myself.context.result = new List(peers);
+        });
+        this.context.wait = true;
+    } else if (this.context.result) {
+        return this.context.result;
+    }
+
+    this.pushContext('doYield');
+    this.pushContext();
+};
+
+Process.prototype.reportPeerId = function () {
+    var stage = this.homeContext.receiver.parentThatIsA(StageMorph);
+    return stage.peerId;
+};
+
 // Process lists primitives
 
 Process.prototype.reportNewList = function (elements) {

@@ -1188,6 +1188,16 @@ SpriteMorph.prototype.initBlocks = function () {
             category: 'other',
             spec: 'send %s to %s'
         },
+        reportPeerId: {
+            type: 'reporter',
+            category: 'other',
+            spec: 'my peer id'
+        },
+        reportPeerList: {
+            type: 'reporter',
+            category: 'other',
+            spec: 'peers online'
+        },
 
         // Code mapping - experimental
         doMapCodeOrHeader: { // experimental
@@ -2118,6 +2128,8 @@ SpriteMorph.prototype.blockTemplates = function (category) {
 
         blocks.push(block('receivePeerMessage'));
         blocks.push(block('sendPeerMessage'));
+        blocks.push(block('reportPeerId'));
+        blocks.push(block('reportPeerList'));
 
         blocks.push('=');
 
@@ -4408,85 +4420,95 @@ StageMorph.prototype.init = function (globals) {
     this.setColor(new Color(255, 255, 255));
     this.fps = this.frameRate;
 
-    this.peer = new Peer({
+    this.initPeering();
+};
+
+StageMorph.prototype.initPeering = function (id) {
+    var myself = this;
+
+    if (window.peers) {
+        // I don't know why, but it works.
+        window.peers.forEach(function (oldpeer) {
+            if (id != oldpeer.id) {
+                oldpeer.destroy()
+            }
+        });
+    }
+
+    this.peer = new Peer(id, {
         host: 'snapmesh.herokuapp.com',
-        port: 80,
+        port: 443,
+        secure: true,
         path: '/'
     });
-    var myself = this;
 
     this.peer.on('open', function (id) {
         myself.peerId = id;
-        console.log('Id: ' + id); // DEBUG
+    });
+    this.peer.on('disconnected', function () {
+        // peer.reconnect does not work (?) because 'id' is undefined
+        if (!myself.peer.destroyed) {
+            myself.initPeering(myself.peerId);
+        }
+    });
+    this.peer.on('error', function (err) {
+        console.log(err); // DEBUG
     });
 
     this.peer.on('connection', function (connection) {
         connection.on('open', function () {
             connection.on('data', function (data) {
-                var ide = myself.parentThatIsA(IDE_Morph);
-                var hats = [], model, message;
-                try {
-                    model = ide.serializer.parse(data);
-                    message = ide.serializer.loadValue(model);
-
-                    // TODO: If a Context is sent, a new Sprite appears.
-                    // This below is just a workaround for one-level rings,
-                    // objects should be cleaned recursively.
-                    message.receiver = null;
-                    message.outerContext = null;
-                } catch (err) {
-                    console.log(err); // DEBUG
-                    // Ok, it does not seem to be XML. It must be a string then.
-                    message = data;
-                }
-
-                // call hat blocks
-                myself.children.concat(myself).forEach(function (morph) {
-                    if (morph instanceof SpriteMorph
-                            || morph instanceof StageMorph) {
-                        hats = hats.concat(
-                                morph.allHatBlocksFor('__peer__message__'));
-                    }
-                });
-                hats.forEach(function (block) {
-                    var process = myself.threads.startProcess(block,
-                            myself.isThreadSafe);
-                    process.context.outerContext.variables.addVar('message');
-                    process.context.outerContext.variables.setVar(
-                        'message',
-                        message
-                    );
-                    process.context.outerContext.variables.addVar('peer');
-                    process.context.outerContext.variables.setVar(
-                        'peer',
-                        connection.peer
-                    );
-                });
+                myself.newPeerMessage(data, connection.peer);
             });
         });
     });
+
+    window.peers.push(this.peer);
 };
 
-// peer to peer communication
+StageMorph.prototype.newPeerMessage = function (data, peer) {
+    var ide = this.parentThatIsA(IDE_Morph);
+    var myself = this;
+    var hats = [], model, message;
 
-SpriteMorph.prototype.sendPeerMessage = function (message, peer) {
-    var stage = this.parentThatIsA(StageMorph),
-        ide = this.parentThatIsA(IDE_Morph);
-    var connection = stage.peer.connect(peer, {reliable: true});
-    connection.on('open', function () {
-        var data;
-        if (typeof message == "string") {
-            data = message;
-        } else if (typeof message == "function") {
-            data = message.toString();
-        } else {
-            data = ide.serializer.serialize(message);
+    try {
+        model = ide.serializer.parse(data);
+        message = ide.serializer.loadValue(model);
+
+        // TODO: If a Context is sent, a new Sprite appears.
+        // This below is just a workaround for one-level rings,
+        // objects should be cleaned recursively.
+        message.receiver = null;
+        message.outerContext = null;
+    } catch (err) {
+        console.log(err); // DEBUG
+        // Ok, it does not seem to be XML. It must be a string then.
+        message = data;
+    }
+
+    // call hat blocks
+    this.children.concat(myself).forEach(function (morph) {
+        if (morph instanceof SpriteMorph
+                || morph instanceof StageMorph) {
+            hats = hats.concat(
+                    morph.allHatBlocksFor('__peer__message__'));
         }
-        connection.send(data);
+    });
+    hats.forEach(function (block) {
+        var process = myself.threads.startProcess(block,
+                myself.isThreadSafe);
+        process.context.outerContext.variables.addVar('message');
+        process.context.outerContext.variables.setVar(
+            'message',
+            message
+        );
+        process.context.outerContext.variables.addVar('peer');
+        process.context.outerContext.variables.setVar(
+            'peer',
+            peer
+        );
     });
 };
-
-StageMorph.prototype.sendPeerMessage = SpriteMorph.prototype.sendPeerMessage;
 
 // StageMorph scaling
 
@@ -5407,6 +5429,8 @@ StageMorph.prototype.blockTemplates = function (category) {
 
         blocks.push(block('receivePeerMessage'));
         blocks.push(block('sendPeerMessage'));
+        blocks.push(block('reportPeerId'));
+        blocks.push(block('reportPeerList'));
         blocks.push('=');
 
         if (StageMorph.prototype.enableCodeMapping) {
