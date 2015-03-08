@@ -1502,6 +1502,8 @@ SpriteMorph.prototype.fullCopy = function () {
         dp.rotatesWithAnchor = part.rotatesWithAnchor;
         c.attachPart(dp);
     });
+    // makes updateMarker() create a new marker
+    c.marker = null;
 
     return c;
 };
@@ -2856,6 +2858,7 @@ SpriteMorph.prototype.clonify = function (stage) {
 SpriteMorph.prototype.removeClone = function () {
     if (this.isClone) {
         // this.stopTalking();
+        window.spriteGroup.removeLayer(this.marker);
         this.parent.threads.stopAllForReceiver(this);
         this.destroy();
         this.parent.cloneCount -= 1;
