@@ -224,10 +224,10 @@ SpriteMorph.prototype.initBlocks = function () {
             category: 'motion',
             spec: 'address at longitude: %n latitude: %n'
         },
-        overpassQuerySucceeds: {
-            type: 'predicate',
+        overpassQuery: {
+            type: 'reporter',
             category: 'sensing',
-            spec: 'overpass query %s returns elements'
+            spec: 'overpass query %s'
         },
         focusMap: {
             type: 'command',
@@ -2033,7 +2033,7 @@ SpriteMorph.prototype.blockTemplates = function (category) {
         blocks.push('-');
         blocks.push(block('reportDate'));
         blocks.push('-');
-        blocks.push(block('overpassQuerySucceeds'));
+        blocks.push(block('overpassQuery'));
 
     // for debugging: ///////////////
 

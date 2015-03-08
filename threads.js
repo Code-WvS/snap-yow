@@ -2692,8 +2692,8 @@ Process.prototype.focusMap = function (lon, lat, zoom) {
 // there is a library imported that uses this function.
 // TODO: Improve this :)
 //
-// returns true if there are elements returned by the overpass query
-Process.prototype.overpassQuerySucceeds = function (query) {
+// returns elements returned by the overpass query
+Process.prototype.overpassQuery = function (query) {
     var url = 'overpass-api.de/api/interpreter?data=[out:json];'
         + query;
 
@@ -2706,7 +2706,7 @@ Process.prototype.overpassQuerySucceeds = function (query) {
         response = this.httpRequest.responseText;
         this.httpRequest = null;
         console.log(response); // DEBUG
-        return JSON.parse(response).elements.length > 0;
+        return new List(JSON.parse(response).elements);
     }
     this.pushContext('doYield');
     this.pushContext();
