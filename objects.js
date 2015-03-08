@@ -4497,14 +4497,14 @@ StageMorph.prototype.newPeerMessage = function (data, peer) {
     hats.forEach(function (block) {
         var process = myself.threads.startProcess(block,
                 myself.isThreadSafe);
-        process.context.outerContext.variables.addVar('message');
+        process.context.outerContext.variables.addVar(localize('message'));
         process.context.outerContext.variables.setVar(
-            'message',
+            localize('message'),
             message
         );
-        process.context.outerContext.variables.addVar('peer');
+        process.context.outerContext.variables.addVar(localize('peer'));
         process.context.outerContext.variables.setVar(
-            'peer',
+            localize('peer'),
             peer
         );
     });

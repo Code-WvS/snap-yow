@@ -1298,6 +1298,15 @@ Process.prototype.doRemoveTemporaries = function () {
 // Peer to peer primitives
 
 Process.prototype.sendPeerMessage = function (message, peer) {
+    var myself = this;
+
+    if (peer instanceof List) {
+        peer.asArray().forEach(function (singlePeer) {
+            myself.sendPeerMessage(message, singlePeer);
+        });
+        return;
+    }
+
     var stage = this.homeContext.receiver.parentThatIsA(StageMorph),
         ide = this.homeContext.receiver.parentThatIsA(IDE_Morph);
     var connection = stage.peer.connect(peer, {reliable: true});
