@@ -66,17 +66,12 @@
 
                 // Grabbing values via global variables from deep inside Snap! is easier
                 // Possible drawback: Multiple worlds could conflict
-                function setGlobalPosition (e) {
+                function locationfound(e) {
+                    if (!window.geoposition) {
+                        // Sets the view on the first locate
+                        map.setView(e.latlng, 18);
+                    }
                     window.geoposition = e.latlng;
-                }
-
-                // Sets the view on the first locate
-                function firstLocate (e) {
-                    map.stopLocate();
-                    map.setView(e.latlng, 18);
-                    setGlobalPosition(e);
-                    map.on('locationfound', setGlobalPosition);
-                    map.locate({watch: true, enableHighAccuracy: true});
                 }
 
                 window.map = map;
@@ -107,8 +102,8 @@
                 }).addTo(map);
 
                 // continuously update the local location variable
-                map.on('locationfound', firstLocate);
-                map.locate({enableHighAccuracy: true});
+                map.on('locationfound', locationfound);
+                map.locate({watch: true, enableHighAccuracy: true});
 
                 // OSMBuildings provides fancy 3D buildings
                 new OSMBuildings(map).load();
