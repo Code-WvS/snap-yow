@@ -4559,11 +4559,9 @@ StageMorph.prototype.init = function (globals) {
 StageMorph.prototype.initPeering = function (id) {
     var myself = this;
 
-    if (window.peers) {
+    if (window.peer) {
         // I don't know why, but it works.
-        while (window.peers.length > 0) {
-            window.peers.pop().destroy();
-        }
+        window.peer.destroy();
     }
 
     this.peer = new Peer(id, {
@@ -4573,13 +4571,10 @@ StageMorph.prototype.initPeering = function (id) {
         path: '/'
     });
 
-    this.peer.on('open', function (id) {
-        myself.peerId = id;
-    });
     this.peer.on('disconnected', function () {
         // peer.reconnect does not work (?) because 'id' is undefined
         if (!myself.peer.destroyed) {
-            myself.initPeering(myself.peerId);
+            myself.initPeering(myself.peer.id);
         }
     });
     this.peer.on('error', function (err) {
@@ -4594,7 +4589,7 @@ StageMorph.prototype.initPeering = function (id) {
         });
     });
 
-    window.peers.push(this.peer);
+    window.peer = this.peer;
 };
 
 StageMorph.prototype.newPeerMessage = function (data, peer) {

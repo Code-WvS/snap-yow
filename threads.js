@@ -1302,15 +1302,13 @@ Process.prototype.sendPeerMessage = function (message, peer) {
     var stage = this.homeContext.receiver.parentThatIsA(StageMorph),
         ide = this.homeContext.receiver.parentThatIsA(IDE_Morph);
 
-    console.log(peer, stage.peerId);
     if (peer instanceof List) {
         peer.asArray().forEach(function (singlePeer) {
             myself.sendPeerMessage(message, singlePeer);
         });
         return;
     }
-    if (peer == stage.peerId) {
-        console.log('hello self!');
+    if (peer == stage.peer.id) {
         stage.newPeerMessage(message, peer);
         return;
     }
@@ -1348,7 +1346,7 @@ Process.prototype.reportPeerList = function () {
 
 Process.prototype.reportPeerId = function () {
     var stage = this.homeContext.receiver.parentThatIsA(StageMorph);
-    return stage.peerId;
+    return stage.peer.id;
 };
 
 // Process lists primitives
