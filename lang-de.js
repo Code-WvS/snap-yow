@@ -625,6 +625,19 @@ SnapTranslator.dict.de = {
     'replace item %idx of %l with %s':
         'ersetze Element %idx in %l durch %s',
 
+    // peer to peer communication
+    'when I receive %upvar from %upvar':
+        'Wenn ich %upvar von %upvar empfange',
+    'peer':
+        'Peer',
+    'send %s to %s':
+        'sende %s an %s',
+    'my peer id':
+        'meine Peer-ID',
+    'peers online':
+        'verbundene Peers',
+
+
     // other
     'Make a block':
         'Neuer Block',
