@@ -3342,7 +3342,7 @@ SpriteMorph.prototype.drawLine = function (start, dest) {
                         destLatLng,
                     ], 
                     {color: this.color.toString(), weight: this.size})
-                        .addTo(window.penTrails);
+                        .addTo(window.penLines);
         } else {
             var latlngs = window.polylines[this.myPolylineIndex].getLatLngs();
             for (var j = 0; j < latlngs.length; j++) {
@@ -3354,7 +3354,7 @@ SpriteMorph.prototype.drawLine = function (start, dest) {
                         .concat([destLatLng]);
                     L.polygon(polyLL, 
                             {color: this.color.toString(), weight: this.size})
-                        .addTo(window.penTrails);
+                        .addTo(window.penShapes);
                     break;
                 }
             }
@@ -4722,6 +4722,8 @@ StageMorph.prototype.drawOn = function (aCanvas, aRect) {
 StageMorph.prototype.clearPenTrails = function () {
     window.map.removeLayer(window.penTrails);
     window.penTrails = L.layerGroup().addTo(window.map);
+    window.penShapes = L.layerGroup().addTo(window.penTrails);
+    window.penLines = L.layerGroup().addTo(window.penTrails);
     this.trailsCanvas = newCanvas(this.dimensions);
     this.changed();
 };

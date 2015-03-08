@@ -2836,6 +2836,8 @@ IDE_Morph.prototype.newProject = function () {
         window.map.removeLayer(window.penTrails);
     }
     window.penTrails = L.layerGroup().addTo(window.map);
+    window.penShapes = L.layerGroup().addTo(window.penTrails);
+    window.penLines = L.layerGroup().addTo(window.penTrails);
 
     this.currentSprite = new SpriteMorph(this.globalVariables);
     this.sprites = new List([this.currentSprite]);

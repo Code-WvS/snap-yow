@@ -1346,6 +1346,8 @@ SnapSerializer.prototype.openProject = function (project, ide) {
     // TODO: "pen trails" are not saved
     window.map.removeLayer(window.penTrails);
     window.penTrails = L.layerGroup().addTo(window.map);
+    window.penShapes = L.layerGroup().addTo(window.penTrails);
+    window.penLines = L.layerGroup().addTo(window.penTrails);
 
     sprites.forEach(function (sprite) {
         // create the markers

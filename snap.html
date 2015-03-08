@@ -121,6 +121,8 @@
                 // so polylines contains complete lines created by different sprites.
                 // These lines might be (partially) transformed into polygons.
                 window.penTrails = L.layerGroup().addTo(map);
+                window.shapes = L.layerGroup().addTo(window.penTrails);
+                window.lines = L.layerGroup().addTo(window.penTrails);
                 window.polylines = polylines;
                 polylineIndex = 0;
                 polylines = [];
