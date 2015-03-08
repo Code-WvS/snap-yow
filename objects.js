@@ -3346,7 +3346,9 @@ SpriteMorph.prototype.drawLine = function (start, dest) {
         } else {
             var latlngs = window.polylines[this.myPolylineIndex].getLatLngs();
             for (var j = 0; j < latlngs.length; j++) {
-                if (latlngs[j].distanceTo(destLatLng) < 0.1) {
+                // If a distance between two points is <= 1 meter,
+                // call them "the same"
+                if (latlngs[j].distanceTo(destLatLng) <= 1) {
                     var polyLL = window.polylines[this.myPolylineIndex]
                         .spliceLatLngs(j, latlngs.length)
                         .concat([destLatLng]);
