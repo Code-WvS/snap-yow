@@ -262,6 +262,8 @@ IDE_Morph.prototype.init = function (isAutoFill) {
 
     // override inherited properites:
     this.color = this.backgroundColor;
+
+    window.peers = [];
 };
 
 IDE_Morph.prototype.openIn = function (world) {

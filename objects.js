@@ -1210,6 +1210,29 @@ SpriteMorph.prototype.initBlocks = function () {
             defaults: [localize('each item')]
         },
 
+        // peer to peer communication
+        receivePeerMessage: {
+            type: 'hat',
+            category: 'other',
+            spec: 'when I receive %upvar from %upvar',
+            defaults: [localize('message'), localize('peer')]
+        },
+        sendPeerMessage: {
+            type: 'command',
+            category: 'other',
+            spec: 'send %s to %s'
+        },
+        reportPeerId: {
+            type: 'reporter',
+            category: 'other',
+            spec: 'my peer id'
+        },
+        reportPeerList: {
+            type: 'reporter',
+            category: 'other',
+            spec: 'peers online'
+        },
+
         // Code mapping - experimental
         doMapCodeOrHeader: { // experimental
             type: 'command',
@@ -2183,6 +2206,13 @@ SpriteMorph.prototype.blockTemplates = function (category) {
         }
 
     /////////////////////////////////
+
+        blocks.push('=');
+
+        blocks.push(block('receivePeerMessage'));
+        blocks.push(block('sendPeerMessage'));
+        blocks.push(block('reportPeerId'));
+        blocks.push(block('reportPeerList'));
 
         blocks.push('=');
 
@@ -3645,6 +3675,9 @@ SpriteMorph.prototype.allHatBlocksFor = function (message) {
             if (morph.selector === 'receiveOnClone') {
                 return message === '__clone__init__';
             }
+            if (morph.selector === 'receivePeerMessage') {
+                return message === '__peer__message__';
+            }
         }
         return false;
     });
@@ -4514,6 +4547,95 @@ StageMorph.prototype.init = function (globals) {
     this.acceptsDrops = false;
     this.setColor(new Color(255, 255, 255));
     this.fps = this.frameRate;
+
+    this.initPeering();
+};
+
+StageMorph.prototype.initPeering = function (id) {
+    var myself = this;
+
+    if (window.peers) {
+        // I don't know why, but it works.
+        window.peers.forEach(function (oldpeer) {
+            if (id != oldpeer.id) {
+                oldpeer.destroy()
+            }
+        });
+    }
+
+    this.peer = new Peer(id, {
+        host: 'snapmesh.herokuapp.com',
+        port: 443,
+        secure: true,
+        path: '/'
+    });
+
+    this.peer.on('open', function (id) {
+        myself.peerId = id;
+    });
+    this.peer.on('disconnected', function () {
+        // peer.reconnect does not work (?) because 'id' is undefined
+        if (!myself.peer.destroyed) {
+            myself.initPeering(myself.peerId);
+        }
+    });
+    this.peer.on('error', function (err) {
+        console.log(err); // DEBUG
+    });
+
+    this.peer.on('connection', function (connection) {
+        connection.on('open', function () {
+            connection.on('data', function (data) {
+                myself.newPeerMessage(data, connection.peer);
+            });
+        });
+    });
+
+    window.peers.push(this.peer);
+};
+
+StageMorph.prototype.newPeerMessage = function (data, peer) {
+    var ide = this.parentThatIsA(IDE_Morph);
+    var myself = this;
+    var hats = [], model, message;
+
+    try {
+        model = ide.serializer.parse(data);
+        message = ide.serializer.loadValue(model);
+
+        // TODO: If a Context is sent, a new Sprite appears.
+        // This below is just a workaround for one-level rings,
+        // objects should be cleaned recursively.
+        message.receiver = null;
+        message.outerContext = null;
+    } catch (err) {
+        console.log(err); // DEBUG
+        // Ok, it does not seem to be XML. It must be a string then.
+        message = data;
+    }
+
+    // call hat blocks
+    this.children.concat(myself).forEach(function (morph) {
+        if (morph instanceof SpriteMorph
+                || morph instanceof StageMorph) {
+            hats = hats.concat(
+                    morph.allHatBlocksFor('__peer__message__'));
+        }
+    });
+    hats.forEach(function (block) {
+        var process = myself.threads.startProcess(block,
+                myself.isThreadSafe);
+        process.context.outerContext.variables.addVar(localize('message'));
+        process.context.outerContext.variables.setVar(
+            localize('message'),
+            message
+        );
+        process.context.outerContext.variables.addVar(localize('peer'));
+        process.context.outerContext.variables.setVar(
+            localize('peer'),
+            peer
+        );
+    });
 };
 
 // StageMorph scaling
@@ -5381,6 +5503,12 @@ StageMorph.prototype.blockTemplates = function (category) {
 
     /////////////////////////////////
 
+        blocks.push('=');
+
+        blocks.push(block('receivePeerMessage'));
+        blocks.push(block('sendPeerMessage'));
+        blocks.push(block('reportPeerId'));
+        blocks.push(block('reportPeerList'));
         blocks.push('=');
 
         if (StageMorph.prototype.enableCodeMapping) {
