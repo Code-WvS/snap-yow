@@ -300,8 +300,8 @@ SnapTranslator.dict.de = {
         'Breitengrad, L\u00e4ngengrad von %s',
     'set focus to longitude: %n latitude: %n with zoom %n':
         'setze den Fokus auf L\u00e4ngengrad: %n Breitengrad: %n mit dem Zoom %n',
-    'overpass query %s returns elements':
-        'Overpass-Anfrage %s gibt Elemente zurück',
+    'overpass query %s':
+        'Overpass-Anfrage %s',
     'move %n meters':
         'gehe %n Meter',
     'turn %clockwise %n degrees':
