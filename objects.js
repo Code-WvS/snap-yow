@@ -4559,11 +4559,6 @@ StageMorph.prototype.init = function (globals) {
 StageMorph.prototype.initPeering = function (id) {
     var myself = this;
 
-    if (window.peer) {
-        // I don't know why, but it works.
-        window.peer.destroy();
-    }
-
     this.peer = new Peer(id, {
         host: 'snapmesh.herokuapp.com',
         port: 443,
@@ -4572,9 +4567,10 @@ StageMorph.prototype.initPeering = function (id) {
     });
 
     this.peer.on('disconnected', function () {
-        // peer.reconnect does not work (?) because 'id' is undefined
-        if (!myself.peer.destroyed) {
-            myself.initPeering(myself.peer.id);
+        if (!myself.peer.destroyed && myself.peer.id) {
+            myself.peer.reconnect();
+        } else {
+            myself.initPeering();
         }
     });
     this.peer.on('error', function (err) {
@@ -4588,8 +4584,6 @@ StageMorph.prototype.initPeering = function (id) {
             });
         });
     });
-
-    window.peer = this.peer;
 };
 
 StageMorph.prototype.newPeerMessage = function (data, peer) {
