@@ -263,7 +263,36 @@ IDE_Morph.prototype.init = function (isAutoFill) {
     // override inherited properites:
     this.color = this.backgroundColor;
 
-    window.peers = [];
+    this.createPeer();
+};
+
+IDE_Morph.prototype.createPeer = function() {
+    var myself = this;
+    this.peer = new Peer(this.peerId, {
+        host: 'snapmesh.herokuapp.com',
+        port: 443,
+        secure: true,
+        path: '/'
+    });
+
+    this.peer.on('open', function (id) {
+        myself.peerId = id;
+    });
+    this.peer.on('disconnected', function () {
+        myself.peer.destroy();
+        myself.createPeer();
+    });
+    this.peer.on('error', function (err) {
+        console.log(err); // DEBUG
+    });
+
+    this.peer.on('connection', function (connection) {
+        connection.on('open', function () {
+            connection.on('data', function (data) {
+                myself.stage.newPeerMessage(data, connection.peer);
+            });
+        });
+    });
 };
 
 IDE_Morph.prototype.openIn = function (world) {
