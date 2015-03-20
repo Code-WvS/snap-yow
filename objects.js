@@ -4419,42 +4419,11 @@ StageMorph.prototype.init = function (globals) {
     this.acceptsDrops = false;
     this.setColor(new Color(255, 255, 255));
     this.fps = this.frameRate;
-
-    this.initPeering();
-};
-
-StageMorph.prototype.initPeering = function (id) {
-    var myself = this;
-
-    this.peer = new Peer(id, {
-        host: 'snapmesh.herokuapp.com',
-        port: 443,
-        secure: true,
-        path: '/'
-    });
-
-    this.peer.on('disconnected', function () {
-        if (!myself.peer.destroyed && myself.peer.id) {
-            myself.peer.reconnect();
-        } else {
-            myself.initPeering();
-        }
-    });
-    this.peer.on('error', function (err) {
-        console.log(err); // DEBUG
-    });
-
-    this.peer.on('connection', function (connection) {
-        connection.on('open', function () {
-            connection.on('data', function (data) {
-                myself.newPeerMessage(data, connection.peer);
-            });
-        });
-    });
 };
 
 StageMorph.prototype.newPeerMessage = function (data, peer) {
     var ide = this.parentThatIsA(IDE_Morph);
+    if (!ide || !peer) return;
     var myself = this;
     var hats = [], model, message;
 

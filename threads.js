@@ -1308,12 +1308,12 @@ Process.prototype.sendPeerMessage = function (message, peer) {
         });
         return;
     }
-    if (peer == stage.peer.id) {
+    if (peer == ide.peer.id) {
         stage.newPeerMessage(message, peer);
         return;
     }
 
-    var connection = stage.peer.connect(peer, {reliable: true});
+    var connection = ide.peer.connect(peer, {reliable: true});
     connection.on('open', function () {
         var data;
         if (typeof message == "string") {
@@ -1331,11 +1331,11 @@ Process.prototype.reportPeerList = function () {
     var myself = this;
 
     if (!this.context.wait) {
-        var stage = this.homeContext.receiver.parentThatIsA(StageMorph);
-        stage.peer.listAllPeers(function (peers) {
+        this.context.wait = true;
+        var ide = this.homeContext.receiver.parentThatIsA(IDE_Morph);
+        ide.peer.listAllPeers(function (peers) {
             myself.context.result = new List(peers);
         });
-        this.context.wait = true;
     } else if (this.context.result) {
         return this.context.result;
     }
@@ -1345,8 +1345,8 @@ Process.prototype.reportPeerList = function () {
 };
 
 Process.prototype.reportPeerId = function () {
-    var stage = this.homeContext.receiver.parentThatIsA(StageMorph);
-    return stage.peer.id;
+    var ide = this.homeContext.receiver.parentThatIsA(IDE_Morph);
+    return ide.peer.id;
 };
 
 // Process lists primitives
