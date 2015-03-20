@@ -45,11 +45,11 @@ sed -i '/link rel="shortcut icon"/a\
 echo "Adding cordova plugins"
 # add everything needed and build for $device
 cordova platform add "$1" > /dev/null
-cordova plugin add \ #org.apache.cordova.plugin.softkeyboard \
+cordova plugin add org.apache.cordova.geolocation 2> /dev/null
+    #org.apache.cordova.plugin.softkeyboard \
     #org.apache.cordova.vibration \
     #org.apache.cordova.device-motion \
     #org.apache.cordova.device-orientation \
-    org.apache.cordova.geolocation 2> /dev/null
     #de.appplant.cordova.plugin.local-notification 2> /dev/null
 
 if [[ $1 == "android" ]]
