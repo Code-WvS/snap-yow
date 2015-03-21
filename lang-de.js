@@ -541,6 +541,16 @@ SnapTranslator.dict.de = {
         'Turbomodus?',
     'set turbo mode to %b':
         'setze Turbomodus auf %b',
+    'vibrate %n seconds':
+        'vibriere %n Sekunden',
+    'current compass heading':
+        'aktuelle Ausrichtung des Kompasses',
+    'current acceleration along the x axis':
+        'aktuelle Beschleunigung entlang der X-Achse',
+    'current acceleration along the y axis':
+        'aktuelle Beschleunigung entlang der Y-Achse',
+    'current acceleration along the z axis':
+        'aktuelle Beschleunigung entlang der Z-Achse',
 
     'filtered for %clr':
         'nach %clr gefiltert',

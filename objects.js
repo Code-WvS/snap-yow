@@ -942,17 +942,17 @@ SpriteMorph.prototype.initBlocks = function () {
         reportAccelerationX: {
             type: 'reporter',
             category: 'sensing',
-            spec: 'current acceleration along the x axes'
+            spec: 'current acceleration along the x axis'
         },
         reportAccelerationY: {
             type: 'reporter',
             category: 'sensing',
-            spec: 'current acceleration along the y axes'
+            spec: 'current acceleration along the y axis'
         },
         reportAccelerationZ: {
             type: 'reporter',
             category: 'sensing',
-            spec: 'current acceleration along the z axes'
+            spec: 'current acceleration along the z axis'
         },
 
         // Operators
