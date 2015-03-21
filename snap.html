@@ -92,7 +92,7 @@
                     });
                 });
 
-                layer = L.tileLayer('http://{s}.tile.osm.org/{z}/{x}/{y}.png', {
+                layer = L.tileLayer('http://api.tiles.mapbox.com/v4/mapbox.streets/{z}/{x}/{y}.jpg70?access_token=pk.eyJ1IjoiY29kZS13dnMiLCJhIjoielU1N2dQayJ9.miUjtJaW7Y_Xx46dC6m0LA', {
                             attribution: '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
                 }).addTo(map);
                 L.control.coordinates({
