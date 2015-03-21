@@ -3384,9 +3384,11 @@ SpriteMorph.prototype.drawLine = function (start, dest) {
             for (var j = 0; j < latlngs.length; j++) {
                 // If a distance between two points is <= 1 meter,
                 // call them "the same"
+                // if the same exists, a polygon can be created
+                // TODO: detect and join lines with "same points"
                 if (latlngs[j].distanceTo(destLatLng) <= 1) {
-                    var polyLL = window.polylines[this.myPolylineIndex]
-                        .spliceLatLngs(j, latlngs.length)
+                    var polyLL = latlngs
+                        .slice(j, latlngs.length)
                         .concat([destLatLng]);
                     L.polygon(polyLL, 
                             {color: this.color.toString(), weight: this.size})
@@ -3433,7 +3435,7 @@ SpriteMorph.prototype.moveBy = function (delta, justMe) {
             part.moveBy(delta);
         });
     }
-    if (!this.isDown) {
+    if (!this.isDown && start) {
         this.myPolylineIndex = window.polylineIndex++;
     }
 };
@@ -4715,6 +4717,8 @@ StageMorph.prototype.drawOn = function (aCanvas, aRect) {
 
 StageMorph.prototype.clearPenTrails = function () {
     window.map.removeLayer(window.penTrails);
+    window.polylines = [];
+    window.polylineIndex = 0;
     window.penTrails = L.layerGroup().addTo(window.map);
     window.penShapes = L.layerGroup().addTo(window.penTrails);
     window.penLines = L.layerGroup().addTo(window.penTrails);
