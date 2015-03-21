@@ -3388,8 +3388,13 @@ SpriteMorph.prototype.drawLine = function (start, dest) {
                 // TODO: detect and join lines with "same points"
                 if (latlngs[j].distanceTo(destLatLng) <= 1) {
                     var polyLL = latlngs
-                        .slice(j, latlngs.length)
+                        .splice(j, latlngs.length)
                         .concat([destLatLng]);
+                    // remove last part of line and replace by polygon
+                    // splice deleted the latlngs that appear now in the polygon
+                    window.polylines[this.myPolylineIndex] = L.polyline(latlngs,
+                        {color: this.color.toString(), weight: this.size})
+                            .addTo(window.penLines);
                     L.polygon(polyLL, 
                             {color: this.color.toString(), weight: this.size})
                         .addTo(window.penShapes);
