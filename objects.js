@@ -2025,10 +2025,10 @@ SpriteMorph.prototype.blockTemplates = function (category) {
         blocks.push(block('reportTouchingObject'));
         blocks.push(block('reportTouchingColor'));
         blocks.push('-');
-        blocks.push(block('doAsk'));
-        blocks.push(watcherToggle('getLastAnswer'));
-        blocks.push(block('getLastAnswer'));
-        blocks.push('-');
+        //blocks.push(block('doAsk'));
+        //blocks.push(watcherToggle('getLastAnswer'));
+        //blocks.push(block('getLastAnswer'));
+        //blocks.push('-');
         blocks.push(watcherToggle('reportMouseX'));
         blocks.push(block('reportMouseX'));
         blocks.push(watcherToggle('reportMouseY'));
@@ -5316,10 +5316,10 @@ StageMorph.prototype.blockTemplates = function (category) {
 
     } else if (cat === 'sensing') {
 
-        blocks.push(block('doAsk'));
-        blocks.push(watcherToggle('getLastAnswer'));
-        blocks.push(block('getLastAnswer'));
-        blocks.push('-');
+        //blocks.push(block('doAsk'));
+        //blocks.push(watcherToggle('getLastAnswer'));
+        //blocks.push(block('getLastAnswer'));
+        //blocks.push('-');
         blocks.push(watcherToggle('reportMouseX'));
         blocks.push(block('reportMouseX'));
         blocks.push(watcherToggle('reportMouseY'));
