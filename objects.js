@@ -541,7 +541,8 @@ SpriteMorph.prototype.initBlocks = function () {
             only: SpriteMorph,
             type: 'command',
             category: 'pen',
-            spec: 'pen down'
+            spec: 'pen down and draw a %drawmode',
+            defalts: ['line']
         },
         up: {
             only: SpriteMorph,
@@ -1434,8 +1435,6 @@ SpriteMorph.prototype.init = function (globals) {
 
     this.isDraggable = true;
     this.isDown = false;
-
-    this.myPolylineIndex = window.polylineIndex++;
 
     this.heading = 90;
     this.changed();
@@ -2921,6 +2920,17 @@ SpriteMorph.prototype.show = function () {
 
 // SpriteMorph pen color
 
+SpriteMorph.prototype.down = function (mode) {
+    // overrides PenMorph.down
+    this.isDown = true;
+    this.penMode = mode[0] || 'line'; // default to line
+    if (this.penMode == 'shape') {
+        this.myPolygonIndex = window.polygonIndex++;
+    } else { // 'line'
+        this.myPolylineIndex = window.polylineIndex++;
+    }
+};
+
 SpriteMorph.prototype.setColor = function (aColor) {
     var x = this.xPosition(),
         y = this.yPosition();
@@ -3370,39 +3380,32 @@ SpriteMorph.prototype.drawLine = function (start, dest) {
         var destLatLng = 
             [stage.dimensions.y / 2 - to.y, to.x - stage.dimensions.x / 2];
 
-        if (!window.polylines[this.myPolylineIndex]) {
-            // add a new line with start and end points
-            window.polylines[this.myPolylineIndex] = L.polyline([
-                        [stage.dimensions.y / 2 - from.y,
-                            from.x - stage.dimensions.x / 2],
-                        destLatLng,
-                    ], 
-                    {color: this.color.toString(), weight: this.size})
-                        .addTo(window.penLines);
-        } else {
-            var latlngs = window.polylines[this.myPolylineIndex].getLatLngs();
-            for (var j = 0; j < latlngs.length; j++) {
-                // If a distance between two points is <= 1 meter,
-                // call them "the same"
-                // if the same exists, a polygon can be created
-                // TODO: detect and join lines with "same points"
-                if (latlngs[j].distanceTo(destLatLng) <= 1) {
-                    var polyLL = latlngs
-                        .splice(j, latlngs.length)
-                        .concat([destLatLng]);
-                    // remove last part of line and replace by polygon
-                    // splice deleted the latlngs that appear now in the polygon
-                    window.polylines[this.myPolylineIndex] = L.polyline(latlngs,
+        if (this.penMode == 'shape') {
+            if (!window.polygons[this.myPolygonIndex]) {
+                // add a new polygon with start and end points
+                window.polygons[this.myPolygonIndex] = L.polygon([
+                            [stage.dimensions.y / 2 - from.y,
+                                from.x - stage.dimensions.x / 2],
+                            destLatLng,
+                        ], 
                         {color: this.color.toString(), weight: this.size})
-                            .addTo(window.penLines);
-                    L.polygon(polyLL, 
-                            {color: this.color.toString(), weight: this.size})
-                        .addTo(window.penShapes);
-                    break;
-                }
+                .addTo(window.penShapes);
+            } else {
+                window.polygons[this.myPolygonIndex].addLatLng(destLatLng);
             }
-
-            window.polylines[this.myPolylineIndex].addLatLng(destLatLng);
+        } else { // 'line'
+            if (!window.polylines[this.myPolylineIndex]) {
+                // add a new line with start and end points
+                window.polylines[this.myPolylineIndex] = L.polyline([
+                            [stage.dimensions.y / 2 - from.y,
+                                from.x - stage.dimensions.x / 2],
+                            destLatLng,
+                        ],
+                        {color: this.color.toString(), weight: this.size})
+                .addTo(window.penLines);
+            } else {
+                window.polylines[this.myPolylineIndex].addLatLng(destLatLng);
+            }
         }
 
         context.lineWidth = this.size;
@@ -3439,9 +3442,6 @@ SpriteMorph.prototype.moveBy = function (delta, justMe) {
         this.parts.forEach(function (part) {
             part.moveBy(delta);
         });
-    }
-    if (!this.isDown && start) {
-        this.myPolylineIndex = window.polylineIndex++;
     }
 };
 
@@ -4722,7 +4722,9 @@ StageMorph.prototype.drawOn = function (aCanvas, aRect) {
 
 StageMorph.prototype.clearPenTrails = function () {
     window.map.removeLayer(window.penTrails);
+    window.polygons = [];
     window.polylines = [];
+    window.polygonIndex = 0;
     window.polylineIndex = 0;
     window.penTrails = L.layerGroup().addTo(window.map);
     window.penShapes = L.layerGroup().addTo(window.penTrails);

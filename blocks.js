@@ -1264,6 +1264,20 @@ SyntaxElementMorph.prototype.labelPart = function (spec) {
             );
             break;
 
+    // Snap! YOW
+        case '%drawmode':
+            part = new InputSlotMorph(
+                null, // text
+                false, // numeric?
+                {
+                    'line' : ['line'],
+                    'shape': ['shape']
+                },
+                true // read-only
+            );
+            part.setContents(['line']);
+            break;
+
     // symbols:
 
         case '%turtle':
