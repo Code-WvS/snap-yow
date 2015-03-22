@@ -48,6 +48,7 @@ cordova platform add "$1" > /dev/null
 cordova plugin add org.apache.cordova.geolocation \
     org.apache.cordova.device-motion \
     org.apache.cordova.device-orientation \
+    org.apache.cordova.network-information \
     org.apache.cordova.vibration 2> /dev/null
     #org.apache.cordova.plugin.softkeyboard \
     #de.appplant.cordova.plugin.local-notification
