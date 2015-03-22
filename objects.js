@@ -541,14 +541,14 @@ SpriteMorph.prototype.initBlocks = function () {
             only: SpriteMorph,
             type: 'command',
             category: 'pen',
-            spec: 'pen down and draw a %drawmode',
-            defalts: ['line']
+            spec: 'pen down'
         },
         up: {
             only: SpriteMorph,
             type: 'command',
             category: 'pen',
-            spec: 'pen up'
+            spec: 'pen up and finish as %drawmode',
+            defaults: ['a line']
         },
         setColor: {
             only: SpriteMorph,
@@ -2921,14 +2921,25 @@ SpriteMorph.prototype.show = function () {
 
 // SpriteMorph pen color
 
-SpriteMorph.prototype.down = function (mode) {
+SpriteMorph.prototype.down = function () {
     // overrides PenMorph.down
-    this.isDown = true;
-    this.penMode = mode[0] || 'line'; // default to line
-    if (this.penMode == 'shape') {
-        this.myPolygonIndex = window.polygonIndex++;
-    } else { // 'line'
-        this.myPolylineIndex = window.polylineIndex++;
+    this.isDown = true;
+    this.myPolylineIndex = window.polylineIndex++;
+};
+
+SpriteMorph.prototype.up = function (mode) {
+    // overrides PenMorph.up
+    this.isDown = false;
+    this.penMode = mode[0]; // default to line
+    if (this.penMode == 'a shape') {
+        // transform the line that has just been finished into a polygon
+        window.polygons[window.polygonIndex++] = L.polygon(
+            window.polylines[this.myPolylineIndex].getLatLngs(),
+            {color: this.color.toString(), weight: this.size})
+        .addTo(window.penShapes);
+        // remove the line that is now a filled shape
+        window.penLines.removeLayer(window.polylines[this.myPolylineIndex]);
+        delete window.polylines[this.myPolyIndex];
     }
 };
 
@@ -3381,32 +3392,17 @@ SpriteMorph.prototype.drawLine = function (start, dest) {
         var destLatLng = 
             [stage.dimensions.y / 2 - to.y, to.x - stage.dimensions.x / 2];
 
-        if (this.penMode == 'shape') {
-            if (!window.polygons[this.myPolygonIndex]) {
-                // add a new polygon with start and end points
-                window.polygons[this.myPolygonIndex] = L.polygon([
-                            [stage.dimensions.y / 2 - from.y,
-                                from.x - stage.dimensions.x / 2],
-                            destLatLng,
-                        ], 
-                        {color: this.color.toString(), weight: this.size})
-                .addTo(window.penShapes);
-            } else {
-                window.polygons[this.myPolygonIndex].addLatLng(destLatLng);
-            }
-        } else { // 'line'
-            if (!window.polylines[this.myPolylineIndex]) {
-                // add a new line with start and end points
-                window.polylines[this.myPolylineIndex] = L.polyline([
-                            [stage.dimensions.y / 2 - from.y,
-                                from.x - stage.dimensions.x / 2],
-                            destLatLng,
-                        ],
-                        {color: this.color.toString(), weight: this.size})
-                .addTo(window.penLines);
-            } else {
-                window.polylines[this.myPolylineIndex].addLatLng(destLatLng);
-            }
+        if (!window.polylines[this.myPolylineIndex]) {
+            // add a new line with start and end points
+            window.polylines[this.myPolylineIndex] = L.polyline([
+                        [stage.dimensions.y / 2 - from.y,
+                            from.x - stage.dimensions.x / 2],
+                        destLatLng,
+                    ],
+                    {color: this.color.toString(), weight: this.size})
+            .addTo(window.penLines);
+        } else {
+            window.polylines[this.myPolylineIndex].addLatLng(destLatLng);
         }
 
         context.lineWidth = this.size;

@@ -405,8 +405,12 @@ SnapTranslator.dict.de = {
         'wische',
     'pen down':
         'Stift runter',
-    'pen up':
-        'Stift hoch',
+    'pen up and finish as %drawmode':
+        'Stift hoch und beende als %drawmode',
+    'a line': // workaround: line is already translated in whitespace
+        'Linie',
+    'a shape':
+        'Fl\u00e4che',
     'set pen color to %clr':
         'setze Stiftfarbe auf %clr',
     'change pen color by %n':

@@ -1270,12 +1270,12 @@ SyntaxElementMorph.prototype.labelPart = function (spec) {
                 null, // text
                 false, // numeric?
                 {
-                    'line' : ['line'],
-                    'shape': ['shape']
+                    'a line' : ['a line'],
+                    'a shape': ['a shape']
                 },
                 true // read-only
             );
-            part.setContents(['line']);
+            part.setContents(['a line']);
             break;
 
     // symbols:
