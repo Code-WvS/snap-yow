@@ -815,12 +815,6 @@ SpriteMorph.prototype.initBlocks = function () {
             category: 'sensing',
             spec: 'touching %clr ?'
         },
-        reportColorIsTouchingColor: {
-            only: SpriteMorph,
-            type: 'predicate',
-            category: 'sensing',
-            spec: 'color %clr is touching %clr ?'
-        },
         colorFiltered: {
             dev: true,
             type: 'reporter',
@@ -2030,7 +2024,6 @@ SpriteMorph.prototype.blockTemplates = function (category) {
 
         blocks.push(block('reportTouchingObject'));
         blocks.push(block('reportTouchingColor'));
-        blocks.push(block('reportColorIsTouchingColor'));
         blocks.push('-');
         blocks.push(block('doAsk'));
         blocks.push(watcherToggle('getLastAnswer'));
@@ -2898,6 +2891,14 @@ SpriteMorph.prototype.removeClone = function () {
 };
 
 // SpriteMorph primitives
+
+SpriteMorph.prototype.isTouching = function (other) {
+    var me = L.latLng(this.yPosition(), this.xPosition());
+        target = L.latLng(other.yPosition(), other.xPosition());
+
+    // could also use leaflet's equals
+    return me.distanceTo(target) < 1; // 1 meter magic number
+};
 
 // SpriteMorph hiding and showing:
 

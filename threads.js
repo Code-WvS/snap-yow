@@ -2444,38 +2444,15 @@ Process.prototype.objectTouchingObject = function (thisObj, name) {
     // and for any parts (subsprites)
     var myself = this,
         those,
-        stage,
-        box,
-        mouse;
+        box;
 
-    if (this.inputOption(name) === 'mouse-pointer') {
-        mouse = thisObj.world().hand.position();
-        if (thisObj.bounds.containsPoint(mouse) &&
-                !thisObj.isTransparentAt(mouse)) {
+    stage = thisObj.parentThatIsA(StageMorph);
+    if (stage) {
+        those = this.getObjectsNamed(name, thisObj, stage); // clones
+        if (those.some(function (any) {
+                return thisObj.isTouching(any);
+            })) {
             return true;
-        }
-    } else {
-        stage = thisObj.parentThatIsA(StageMorph);
-        if (stage) {
-            if (this.inputOption(name) === 'edge') {
-                box = thisObj.bounds;
-                if (!thisObj.costume && thisObj.penBounds) {
-                    box = thisObj.penBounds.translateBy(thisObj.position());
-                }
-                if (!stage.bounds.containsRectangle(box)) {
-                    return true;
-                }
-            }
-            if (this.inputOption(name) === 'pen trails' &&
-                    thisObj.isTouching(stage.penTrailsMorph())) {
-                return true;
-            }
-            those = this.getObjectsNamed(name, thisObj, stage); // clones
-            if (those.some(function (any) {
-                    return thisObj.isTouching(any);
-                })) {
-                return true;
-            }
         }
     }
     return thisObj.parts.some(
@@ -2488,68 +2465,46 @@ Process.prototype.objectTouchingObject = function (thisObj, name) {
 Process.prototype.reportTouchingColor = function (aColor) {
     // also check for any parts (subsprites)
     var thisObj = this.homeContext.receiver,
-        stage;
+        color = aColor.toString(),
+        stage, sprites;
 
+    console.log('color', color);
     if (thisObj) {
-        stage = thisObj.parentThatIsA(StageMorph);
-        if (stage) {
-            if (thisObj.isTouching(stage.colorFiltered(aColor, thisObj))) {
-                return true;
-            }
-            return thisObj.parts.some(
-                function (any) {
-                    return any.isTouching(stage.colorFiltered(aColor, any));
+        console.log(thisObj.parts.length);
+        return thisObj.parts.concat([thisObj]).some(
+            function (any) {
+                // check if a sprite is inside a polygon colored 'aColor'
+                var matches = leafletPip.pointInLayer(
+                        // leafletPip swaps lat/lon, be careful
+                        [any.xPosition(), any.yPosition()],
+                        window.penShapes);
+                for (var j = 0; j < matches.length; j++) {
+                    console.log('match color', matches[j].options.color);
+                    if (matches[j].options.color == color) {
+                        console.log('Hoooray!');
+                        return true;
+                    }
                 }
-            );
-        }
-    }
-    return false;
-};
-
-Process.prototype.reportColorIsTouchingColor = function (color1, color2) {
-    // also check for any parts (subsprites)
-    var thisObj = this.homeContext.receiver,
-        stage;
-
-    if (thisObj) {
-        stage = thisObj.parentThatIsA(StageMorph);
-        if (stage) {
-            if (thisObj.colorFiltered(color1).isTouching(
-                    stage.colorFiltered(color2, thisObj)
-                )) {
-                return true;
+                return false;
             }
-            return thisObj.parts.some(
-                function (any) {
-                    return any.colorFiltered(color1).isTouching(
-                        stage.colorFiltered(color2, any)
-                    );
-                }
-            );
-        }
+        );
     }
     return false;
 };
 
 Process.prototype.reportDistanceTo = function (name) {
     var thisObj = this.blockReceiver(),
-        thatObj,
         stage,
-        rc,
-        point;
+        thatObj;
 
     if (thisObj) {
-        rc = thisObj.rotationCenter();
-        point = rc;
-        if (this.inputOption(name) === 'mouse-pointer') {
-            point = thisObj.world().hand.position();
-        }
         stage = thisObj.parentThatIsA(StageMorph);
         thatObj = this.getOtherObject(name, thisObj, stage);
-        if (thatObj) {
-            point = thatObj.rotationCenter();
-        }
-        return rc.distanceTo(point) / stage.scale;
+        var thisPoint = L.latLng(thisObj.yPosition(), thisObj.xPosition());
+            thatPoint = L.latLng(thatObj.yPosition(), thatObj.xPosition());
+
+        // in meters
+        return thisPoint.distanceTo(thatPoint);
     }
     return 0;
 };

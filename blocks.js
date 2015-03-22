@@ -6653,9 +6653,9 @@ InputSlotMorph.prototype.messagesReceivedMenu = function () {
 
 InputSlotMorph.prototype.collidablesMenu = function () {
     var dict = {
-            'mouse-pointer' : ['mouse-pointer'],
+            /*'mouse-pointer' : ['mouse-pointer'],
             edge : ['edge'],
-            'pen trails' : ['pen trails']
+            'pen trails' : ['pen trails']*/
         },
         rcvr = this.parentThatIsA(BlockMorph).receiver(),
         stage = rcvr.parentThatIsA(StageMorph),
@@ -6679,7 +6679,7 @@ InputSlotMorph.prototype.collidablesMenu = function () {
 
 InputSlotMorph.prototype.distancesMenu = function () {
     var dict = {
-            'mouse-pointer' : ['mouse-pointer']
+            //'mouse-pointer' : ['mouse-pointer']
         },
         rcvr = this.parentThatIsA(BlockMorph).receiver(),
         stage = rcvr.parentThatIsA(StageMorph),
