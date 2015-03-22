@@ -881,6 +881,11 @@ SpriteMorph.prototype.initBlocks = function () {
             category: 'sensing',
             spec: 'distance to %dst'
         },
+        reportDistanceFromTo: {
+            type: 'reporter',
+            category: 'sensing',
+            spec: 'distance from longitude: %n latitude: %n to lon: %n lat: %n'
+        },
         doResetTimer: {
             type: 'command',
             category: 'sensing',
@@ -2038,6 +2043,7 @@ SpriteMorph.prototype.blockTemplates = function (category) {
         blocks.push(block('reportKeyPressed'));
         blocks.push('-');
         blocks.push(block('reportDistanceTo'));
+        blocks.push(block('reportDistanceFromTo'));
         blocks.push('-');
         blocks.push(block('doResetTimer'));
         blocks.push(watcherToggle('getTimer'));

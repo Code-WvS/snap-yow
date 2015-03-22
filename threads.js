@@ -2509,6 +2509,12 @@ Process.prototype.reportDistanceTo = function (name) {
     return 0;
 };
 
+Process.prototype.reportDistanceFromTo = function (lon1, lat1, lon2, lat2) {
+    var thisPoint = L.latLng(lat1, lon1),
+        thatPoint = L.latLng(lat2, lon2);
+    return thisPoint.distanceTo(thatPoint);
+};
+
 Process.prototype.reportAttributeOf = function (attribute, name) {
     var thisObj = this.blockReceiver(),
         thatObj,
