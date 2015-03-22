@@ -2937,10 +2937,13 @@ SpriteMorph.prototype.up = function (mode) {
     // overrides PenMorph.up
     this.isDown = false;
     this.penMode = mode[0]; // default to line
+    if (window.polylines[this.myPolylineIndex].getLatLngs().length < 3)
+        return;
+
     if (this.penMode == 'a shape') {
         // transform the line that has just been finished into a polygon
         window.polygons[window.polygonIndex++] = L.polygon(
-            window.polylines[this.myPolylineIndex].getLatLngs(),
+            window.polylines[this.myPolylineIndex++].getLatLngs(),
             {color: this.color.toString(), weight: this.size})
         .addTo(window.penShapes);
         // remove the line that is now a filled shape
