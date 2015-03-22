@@ -95,44 +95,38 @@
                     });
                 });
 
+                var state = "mobilewifi"; // TODO: check other states than listed below
                 // TODO: too much repeated code, shorten the url part
                 if ("connection" in navigator) {
                     // mobile cordova app
-                    console.log('DEBUG - detected mobile');
                     state = navigator.connection.type;
-                    // download everything & in high resolution
-                    if (state == Connection.ETHERNET || state == Connection.WIFI) {
-                        layer = L.tileLayer('http://api.tiles.mapbox.com/v4/mapbox.streets/{z}/{x}/{y}@2x.png?access_token=pk.eyJ1IjoiY29kZS13dnMiLCJhIjoielU1N2dQayJ9.miUjtJaW7Y_Xx46dC6m0LA', {
-                            useCache: true,
-                            cacheMaxAge: 604800000, // one week
-                            attribution: '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
-                        });
-                        new OSMBuildings(map).load();
-                    // download low-res and cache as much as possible
-                    // we do not need OSMBuildings here
-                    } else if (state == Connection.CELL) {
-                        layer = L.tileLayer('http://api.tiles.mapbox.com/v4/mapbox.streets/{z}/{x}/{y}.jpg70?access_token=pk.eyJ1IjoiY29kZS13dnMiLCJhIjoielU1N2dQayJ9.miUjtJaW7Y_Xx46dC6m0LA', {
-                            useCache: true,
-                            cacheMaxAge: 604800000, // one week
-                            attribution: '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
-                        });
-                    // shit, we're offline - let's hope there is something cached
-                    // OSMBuildings won't work, anyway
-                    } else {
-                        layer = L.tileLayer('http://api.tiles.mapbox.com/v4/mapbox.streets/{z}/{x}/{y}.jpg70?access_token=pk.eyJ1IjoiY29kZS13dnMiLCJhIjoielU1N2dQayJ9.miUjtJaW7Y_Xx46dC6m0LA', {
-                            useCache: true,
-                            useOnlyCache: true,
-                            cacheMaxAge: 604800000, // one week
-                            attribution: '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
-                        });
-                    }
-                } else {
-                    // desktop
+                }
+                console.log('Using tile layer appropriate for ' + state);
+                // download everything and in high resolution
+                if (state == 'mobilewifi') {
                     layer = L.tileLayer('http://api.tiles.mapbox.com/v4/mapbox.streets/{z}/{x}/{y}@2x.png?access_token=pk.eyJ1IjoiY29kZS13dnMiLCJhIjoielU1N2dQayJ9.miUjtJaW7Y_Xx46dC6m0LA', {
                         useCache: true,
+                        cacheMaxAge: 604800000, // one week
                         attribution: '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
                     });
                     new OSMBuildings(map).load();
+                // download low-res and cache as much as possible
+                // we do not need OSMBuildings here
+                } else if (state == "mobilecellular") {
+                    layer = L.tileLayer('http://api.tiles.mapbox.com/v4/mapbox.streets/{z}/{x}/{y}.jpg70?access_token=pk.eyJ1IjoiY29kZS13dnMiLCJhIjoielU1N2dQayJ9.miUjtJaW7Y_Xx46dC6m0LA', {
+                        useCache: true,
+                        cacheMaxAge: 604800000, // one week
+                        attribution: '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
+                    });
+                // shit, we're offline - let's hope there is something cached
+                // OSMBuildings won't work, anyway
+                } else {
+                    layer = L.tileLayer('http://api.tiles.mapbox.com/v4/mapbox.streets/{z}/{x}/{y}.jpg70?access_token=pk.eyJ1IjoiY29kZS13dnMiLCJhIjoielU1N2dQayJ9.miUjtJaW7Y_Xx46dC6m0LA', {
+                        useCache: true,
+                        useOnlyCache: true,
+                        cacheMaxAge: 604800000, // one week
+                        attribution: '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors'
+                    });
                 }
                 layer.addTo(map);
                 L.control.coordinates({
