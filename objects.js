@@ -1962,8 +1962,8 @@ SpriteMorph.prototype.blockTemplates = function (category) {
         blocks.push('-');
         blocks.push(block('changeSize'));
         blocks.push(block('setSize'));
-        blocks.push('-');
-        blocks.push(block('doStamp'));
+        //blocks.push('-');
+        //blocks.push(block('doStamp'));
 
     } else if (cat === 'control') {
 
