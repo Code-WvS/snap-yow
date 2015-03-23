@@ -2940,6 +2940,7 @@ SpriteMorph.prototype.up = function (mode) {
     if (window.polylines[this.myPolylineIndex].getLatLngs().length < 3)
         return;
 
+    // Note to future self: You might want to improve this with https://www.mapbox.com/mapbox.js/example/v1.0.0/turf/
     if (this.penMode == 'a shape') {
         // transform the line that has just been finished into a polygon
         window.polygons[window.polygonIndex++] = L.polygon(
