@@ -2518,6 +2518,18 @@ IDE_Morph.prototype.projectMenu = function () {
         'load the official library of\npowerful blocks'
     );
     menu.addItem(
+        'Import geo utilities',
+        function () {
+            myself.droppedText(
+                myself.getURL( // TODO change to 'OrRelative' later
+                    'overpass.xml'
+                ),
+                'overpass'
+            );
+        },
+        'load a geo library of powerful\nblocks for Your Own World'
+    );
+    menu.addItem(
         'Libraries...',
         function () {
             // read a list of libraries from an external file,
@@ -2883,7 +2895,6 @@ IDE_Morph.prototype.newProject = function () {
     this.createCorral();
     this.selectSprite(this.stage.children[0]);
     this.fixLayout();
-    this.droppedText(this.getURL('overpass.xml')); // YOW hack (TODO)
 };
 
 IDE_Morph.prototype.save = function () {

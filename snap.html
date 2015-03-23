@@ -191,9 +191,6 @@
                 ide = new IDE_Morph();
                 ide.openIn(world);
 
-                setTimeout(function () { // FIXME dirty hack
-                    ide.droppedText(ide.getURL('overpass.xml'));
-                }, 2000);
                 setInterval(loop, 10);
         </script>
     </body>
