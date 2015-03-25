@@ -2535,6 +2535,8 @@ Process.prototype.reportAttributeOf = function (attribute, name) {
                 return thatObj.variables.getVar(attribute);
             }
             switch (this.inputOption(attribute)) {
+            case 'shape size':
+                return thatObj.shapeSize();
             case 'x position':
                 return thatObj.xPosition ? thatObj.xPosition() : '';
             case 'y position':

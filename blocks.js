@@ -6769,6 +6769,7 @@ InputSlotMorph.prototype.attributesMenu = function () {
     }
     if (obj instanceof SpriteMorph) {
         dict = {
+            'shape size' : ['shape size'],
             'longitude' : ['x position'],
             'latitude' : ['y position'],
             'direction' : ['direction'],

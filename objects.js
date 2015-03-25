@@ -598,6 +598,12 @@ SpriteMorph.prototype.initBlocks = function () {
             spec: 'set pen size to %n',
             defaults: [1]
         },
+        shapeSize: {
+            only: SpriteMorph,
+            type: 'reporter',
+            category: 'pen',
+            spec: 'size of drawn shapes in m²'
+        },
         doStamp: {
             only: SpriteMorph,
             type: 'command',
@@ -1970,6 +1976,8 @@ SpriteMorph.prototype.blockTemplates = function (category) {
         blocks.push('-');
         blocks.push(block('changeSize'));
         blocks.push(block('setSize'));
+        blocks.push('-');
+        blocks.push(block('shapeSize'));
         //blocks.push('-');
         //blocks.push(block('doStamp'));
 
@@ -3109,6 +3117,14 @@ SpriteMorph.prototype.setSize = function (size) {
 
 SpriteMorph.prototype.changeSize = function (delta) {
     this.setSize(this.size + (+delta || 0));
+};
+
+SpriteMorph.prototype.shapeSize = function () {
+    var size = 0;
+    this.penShapes.eachLayer(function (layer) {
+        size += LGeo.area(layer);
+    });
+    return size;
 };
 
 // SpriteMorph scale
