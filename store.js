@@ -386,16 +386,6 @@ SnapSerializer.prototype.rawLoadProjectModel = function (xmlNode) {
         project.stage.fps = 30;
         StageMorph.prototype.frameRate = 30;
     }
-    model.pentrails = model.stage.childNamed('pentrails');
-    if (model.pentrails) {
-        project.pentrails = new Image();
-        project.pentrails.onload = function () {
-            var context = project.stage.trailsCanvas.getContext('2d');
-            context.drawImage(project.pentrails, 0, 0);
-            project.stage.changed();
-        };
-        project.pentrails.src = model.pentrails.contents;
-    }
     project.stage.setTempo(model.stage.attributes.tempo);
     StageMorph.prototype.dimensions = new Point(480, 360);
     if (model.stage.attributes.width) {
@@ -636,6 +626,16 @@ SnapSerializer.prototype.loadSprites = function (xmlString, ide) {
         sprite.heading = parseFloat(model.attributes.heading) || 0;
         sprite.drawNew();
         sprite.gotoXY(+model.attributes.x || 0, +model.attributes.y || 0);
+        sprite.penLines = L.geoJson(JSON.parse(model.attributes.penLines),
+                // style in the CURRENT color. This is a temporary solution.
+                // TODO: save & load styles for each layer
+                {style: {color: sprite.color, weight: sprite.size}}
+            )
+            .addTo(window.penTrails);
+        sprite.penShapes = L.geoJson(JSON.parse(model.attributes.penShapes),
+                {style: {color: sprite.color, weight: sprite.size}}
+            )
+            .addTo(window.penTrails);
         myself.loadObject(sprite, model);
     });
 
@@ -1181,6 +1181,14 @@ SnapSerializer.prototype.loadValue = function (model) {
         v.heading = parseFloat(model.attributes.heading) || 0;
         v.drawNew();
         v.gotoXY(+model.attributes.x || 0, +model.attributes.y || 0);
+        v.penLines = L.geoJson(JSON.parse(model.attributes.penLines),
+                {style: {color: v.color, weight: v.size}}
+            )
+            .addTo(window.penTrails);
+        v.penShapes = L.geoJson(JSON.parse(model.attributes.penShapes),
+                {style: {color: v.color, weight: v.size}}
+            )
+            .addTo(window.penTrails);
         myself.loadObject(v, model);
         return v;
     case 'context':
@@ -1342,12 +1350,6 @@ SnapSerializer.prototype.openProject = function (project, ide) {
     // recreate all Sprite markers (Snap-YOW)
     window.map.removeLayer(window.spriteGroup);
     window.spriteGroup = L.layerGroup().addTo(window.map);
-    // create new pen trails
-    // TODO: "pen trails" are not saved
-    window.map.removeLayer(window.penTrails);
-    window.penTrails = L.layerGroup().addTo(window.map);
-    window.penShapes = L.layerGroup().addTo(window.penTrails);
-    window.penLines = L.layerGroup().addTo(window.penTrails);
 
     sprites.forEach(function (sprite) {
         // create the markers
@@ -1482,6 +1484,8 @@ SpriteMorph.prototype.toXML = function (serializer) {
             ' scale="@"' +
             ' rotation="@"' +
             ' draggable="@"' +
+            ' penLines="@"' +
+            ' penShapes="@"' +
             '%' +
             ' costume="@" color="@,@,@" pen="@" ~>' +
             '%' + // nesting info
@@ -1499,6 +1503,8 @@ SpriteMorph.prototype.toXML = function (serializer) {
         this.scale,
         this.rotationStyle,
         this.isDraggable,
+        JSON.stringify(this.penLines.toGeoJSON()),
+        JSON.stringify(this.penShapes.toGeoJSON()),
         this.isVisible ? '' : ' hidden="true"',
         this.getCostumeIdx(),
         this.color.r,
