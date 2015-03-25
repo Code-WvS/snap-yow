@@ -2518,7 +2518,7 @@ IDE_Morph.prototype.projectMenu = function () {
         'load the official library of\npowerful blocks'
     );
     menu.addItem(
-        'Import geo utilities',
+        'Import overpass utilities',
         function () {
             myself.droppedText(
                 myself.getURL( // TODO change to 'OrRelative' later
@@ -2527,7 +2527,7 @@ IDE_Morph.prototype.projectMenu = function () {
                 'overpass'
             );
         },
-        'load a geo library of powerful\nblocks for Your Own World'
+        'load a geo library that provides\nsample overpass blocks'
     );
     menu.addItem(
         'Libraries...',
