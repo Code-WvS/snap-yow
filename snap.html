@@ -171,19 +171,8 @@
                 window.spriteGroup = spriteGroup;
                 spriteGroup = L.layerGroup().addTo(map);
 
-                // During a pen down, a polything (thing = line/shape) is updated
-                // at polything[this.myPolythingIndex].
-                // On pen down, myPolythingIndex is set to window.polythingIndex and
-                // window.polythingIndex is incremented
-                // so window.polygons and window.polylines contain
-                // polygons/lines created by all sprites.
+                // every sprite has its own polylines/polygons that are added to penTrails
                 window.penTrails = L.layerGroup().addTo(map);
-                window.penShapes = L.layerGroup().addTo(window.penTrails);
-                window.penLines = L.layerGroup().addTo(window.penTrails);
-                window.polygons = [];
-                window.polylines = [];
-                window.polygonIndex = 0;
-                window.polylineIndex = 0;
 
                 // Load the IDE
                 world = new WorldMorph(document.getElementById('world'));

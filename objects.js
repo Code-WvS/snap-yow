@@ -1435,6 +1435,9 @@ SpriteMorph.prototype.init = function (globals) {
     this.isDraggable = true;
     this.isDown = false;
 
+    this.penShapes = L.layerGroup().addTo(window.penTrails);
+    this.penLines = L.layerGroup().addTo(window.penTrails);
+
     this.heading = 90;
     this.changed();
     this.drawNew();
@@ -2890,6 +2893,8 @@ SpriteMorph.prototype.removeClone = function () {
     if (this.isClone) {
         // this.stopTalking();
         window.spriteGroup.removeLayer(this.marker);
+        window.penTrails.removeLayer(this.penLines);
+        window.penTrails.removeLayer(this.penShapes);
         this.parent.threads.stopAllForReceiver(this);
         this.destroy();
         this.parent.cloneCount -= 1;
@@ -2927,29 +2932,40 @@ SpriteMorph.prototype.show = function () {
 
 // SpriteMorph pen color
 
-SpriteMorph.prototype.down = function () {
-    // overrides PenMorph.down
+SpriteMorph.prototype.down = function () {
+    // overrides PenMorph.down
     this.isDown = true;
-    this.myPolylineIndex = window.polylineIndex++;
+    this.penLines.addLayer(
+        L.polyline(
+            [[this.yPosition(), this.xPosition()]],
+            {color: this.color.toString(), weight: this.size}
+        )
+    ).addTo(window.penTrails);
 };
 
 SpriteMorph.prototype.up = function (mode) {
     // overrides PenMorph.up
     this.isDown = false;
     this.penMode = mode[0]; // default to line
-    if (window.polylines[this.myPolylineIndex].getLatLngs().length < 3)
+
+    // at least 3 points are needed for a shape
+    if (this.penLines.getLayers().length == 0)
+        return;
+    if (this.penLines.getLayers()[this.penLines.getLayers().length - 1].getLatLngs().length < 3)
         return;
 
     // Note to future self: You might want to improve this with https://www.mapbox.com/mapbox.js/example/v1.0.0/turf/
     if (this.penMode == 'a shape') {
         // transform the line that has just been finished into a polygon
-        window.polygons[window.polygonIndex++] = L.polygon(
-            window.polylines[this.myPolylineIndex++].getLatLngs(),
-            {color: this.color.toString(), weight: this.size})
-        .addTo(window.penShapes);
+        this.penShapes.addLayer(
+            L.polygon(
+                this.penLines.getLayers()[this.penLines.getLayers().length - 1].getLatLngs(),
+                {color: this.color.toString(), weight: this.size}
+            )
+        ).addTo(window.penTrails);
         // remove the line that is now a filled shape
-        window.penLines.removeLayer(window.polylines[this.myPolylineIndex]);
-        delete window.polylines[this.myPolyIndex];
+        window.penTrails.removeLayer(this.penLines.getLayers()[this.penLines.getLayers().length - 1]);
+        this.penLines.removeLayer(this.penLines.getLayers()[this.penLines.getLayers().length - 1]);
     }
 };
 
@@ -3402,18 +3418,7 @@ SpriteMorph.prototype.drawLine = function (start, dest) {
         var destLatLng = 
             [stage.dimensions.y / 2 - to.y, to.x - stage.dimensions.x / 2];
 
-        if (!window.polylines[this.myPolylineIndex]) {
-            // add a new line with start and end points
-            window.polylines[this.myPolylineIndex] = L.polyline([
-                        [stage.dimensions.y / 2 - from.y,
-                            from.x - stage.dimensions.x / 2],
-                        destLatLng,
-                    ],
-                    {color: this.color.toString(), weight: this.size})
-            .addTo(window.penLines);
-        } else {
-            window.polylines[this.myPolylineIndex].addLatLng(destLatLng);
-        }
+        this.penLines.getLayers()[this.penLines.getLayers().length - 1].addLatLng(destLatLng);
 
         context.lineWidth = this.size;
         context.strokeStyle = this.color.toString();
@@ -4729,13 +4734,11 @@ StageMorph.prototype.drawOn = function (aCanvas, aRect) {
 
 StageMorph.prototype.clearPenTrails = function () {
     window.map.removeLayer(window.penTrails);
-    window.polygons = [];
-    window.polylines = [];
-    window.polygonIndex = 0;
-    window.polylineIndex = 0;
-    window.penTrails = L.layerGroup().addTo(window.map);
-    window.penShapes = L.layerGroup().addTo(window.penTrails);
-    window.penLines = L.layerGroup().addTo(window.penTrails);
+    window.penTrails = L.layerGroup().addTo(window.map);
+    this.children.forEach(function (sprite) {
+        sprite.penShapes = L.layerGroup().addTo(window.penTrails);
+        sprite.penLines = L.layerGroup().addTo(window.penTrails);
+    });
     this.trailsCanvas = newCanvas(this.dimensions);
     this.changed();
 };
