@@ -2912,6 +2912,10 @@ SpriteMorph.prototype.removeClone = function () {
 // SpriteMorph primitives
 
 SpriteMorph.prototype.isTouching = function (other) {
+    // TODO: workaround, look at this later again
+    // isTouching seems to be used with other != SpriteMorph
+    if (other instanceof SpeechBubbleMorph) return false;
+
     var me = L.latLng(this.yPosition(), this.xPosition());
         target = L.latLng(other.yPosition(), other.xPosition());
 
