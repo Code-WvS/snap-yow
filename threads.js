@@ -2468,9 +2468,7 @@ Process.prototype.reportTouchingColor = function (aColor) {
         color = aColor.toString(),
         stage, sprites;
 
-    console.log('color', color);
     if (thisObj) {
-        console.log(thisObj.parts.length);
         return thisObj.parts.concat([thisObj]).some(
             function (any) {
                 // check if a sprite is inside a polygon colored 'aColor'
@@ -2479,9 +2477,7 @@ Process.prototype.reportTouchingColor = function (aColor) {
                         [any.xPosition(), any.yPosition()],
                         window.penShapes);
                 for (var j = 0; j < matches.length; j++) {
-                    console.log('match color', matches[j].options.color);
                     if (matches[j].options.color == color) {
-                        console.log('Hoooray!');
                         return true;
                     }
                 }
