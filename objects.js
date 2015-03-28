@@ -535,7 +535,7 @@ SpriteMorph.prototype.initBlocks = function () {
         clear: {
             type: 'command',
             category: 'pen',
-            spec: 'clear'
+            spec: 'clear %clearmode'
         },
         down: {
             only: SpriteMorph,
@@ -3106,8 +3106,15 @@ SpriteMorph.prototype.doStamp = function () {
     }
 };
 
-SpriteMorph.prototype.clear = function () {
-    this.parent.clearPenTrails();
+SpriteMorph.prototype.clear = function (mode) {
+    if (mode == 'my pen trails') {
+        window.penTrails.removeLayer(this.penShapes);
+        window.penTrails.removeLayer(this.penLines);
+        this.penShapes = L.layerGroup().addTo(window.penTrails);
+        this.penLines = L.layerGroup().addTo(window.penTrails);
+    } else {
+        this.parent.clearPenTrails();
+    }
 };
 
 // SpriteMorph pen size

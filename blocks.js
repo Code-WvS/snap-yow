@@ -1277,6 +1277,18 @@ SyntaxElementMorph.prototype.labelPart = function (spec) {
             );
             part.setContents(['a line']);
             break;
+        case '%clearmode':
+            part = new InputSlotMorph(
+                null, // text
+                false, // numeric?
+                {
+                    'my pen trails': ['my pen trails'],
+                    'all pen trails': ['all pen trails']
+                },
+                true
+            );
+            part.setContents(['all pen trails']);
+            break;
 
     // symbols:
 
