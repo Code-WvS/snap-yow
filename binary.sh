@@ -68,9 +68,10 @@ then
         sed -i "s/snap.html/snap.html${url}/g" config.xml package.json
     else
         # load custom project from url
-        sed -i "/overpass\.xml/a\
-            ide.droppedText(ide.getURL('$url'));" snap.html
-        sed -i "/overpass\.xml/d" snap.html
+        sed -i "/ide\.openIn/a\
+            setTimeout(function () {\
+                ide.droppedText(ide.getURL('$url'));\
+            }, 2000);" snap.html
         sed -i "/this.toggleAppMode(false)/d" gui.js
         sed -i "s/snap.html/snap.html#run:/g" config.xml package.json
     fi
