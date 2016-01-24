@@ -1,5 +1,10 @@
+This project is not under active development.
+Most things should work, just [try yourself](http://code-wvs.github.io/snap-yow/snap.html).
 
-Snap! Build Your Own Blocks
+Originally, it was intended to deploy Snap-YOW games on smartphones. You can do it with an Android phone, a GNU/Linux machine, Apache Cordova and `binary.sh`.
+
+
+Based on Snap! Build Your Own Blocks
 
 http://snap.berkeley.edu
 
